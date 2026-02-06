@@ -20,35 +20,30 @@
         #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; }
         #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 900; backdrop-filter: blur(4px); }
         
-        /* Cat Stage */
+        /* Cat Wrapper */
         #cat-wrapper {
             position: relative;
             transform-origin: bottom center;
             transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
         
-        /* Emotion States */
+        /* Emotions */
         .emotion-happy { animation: bounce 1s infinite; }
         .emotion-sad { transform: translateY(20px) scale(0.95); filter: brightness(0.8); }
         .emotion-angry { animation: shake 0.5s infinite; filter: hue-rotate(-30deg) brightness(0.9); }
         .emotion-love { animation: heartbeat 1.2s infinite; filter: hue-rotate(30deg); }
-        .emotion-scared { transform: scale(0.9); animation: tremble 0.3s infinite; }
         
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-        @keyframes tremble { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3px); } }
         @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
         
-        /* Head Animations */
+        /* Speaking Animation */
         .is-speaking #head-group { animation: wobble 0.3s infinite alternate; }
         @keyframes wobble { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
         
-        /* Eye Animations */
+        /* Eyes */
         .eye-lid { transform-origin: center; transition: transform 0.1s; }
         .blink .eye-lid { transform: scaleY(0.1); }
-        .emotion-sad .eye-lid { transform: scaleY(0.6) translateY(2px); }
-        .emotion-angry .eye-lid { transform: scaleY(0.7) rotate(15deg); }
-        .emotion-love .eye-lid { transform: scaleY(0.2); }
         
         /* Tail */
         #tail {
@@ -58,9 +53,6 @@
         @keyframes tailWag { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(15deg); } }
         .emotion-happy #tail, .emotion-love #tail { animation: tailWagFast 0.4s infinite; }
         @keyframes tailWagFast { 0%, 100% { transform: rotate(-15deg); } 50% { transform: rotate(25deg); } }
-        .emotion-sad #tail { animation: none; transform: rotate(-25deg); }
-        .emotion-angry #tail { animation: tailFlick 0.15s infinite; }
-        @keyframes tailFlick { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-35deg); } }
         
         /* Speech Bubble */
         #speech-bubble { 
@@ -69,10 +61,130 @@
             width: 85vw; 
             max-width: 320px; 
             touch-action: none;
-            transition: all 0.3s;
         }
         
-        /* Effects */
+        /* In-App Browser */
+        #browser-panel {
+            position: fixed;
+            right: -100%;
+            top: 0;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            background: white;
+            z-index: 2000;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+        }
+        #browser-panel.active { right: 0; }
+        #browser-panel.fullscreen {
+            max-width: 100%;
+            right: 0;
+        }
+        
+        .browser-header {
+            background: #f1f5f9;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .browser-frame {
+            flex: 1;
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Google Icon Popup */
+        .google-popup {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%) translateX(100px);
+            background: white;
+            padding: 16px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 1500;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 100px;
+        }
+        .google-popup.active {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+        
+        .google-btn {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4285f4, #34a853, #fbbc05, #ea4335);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.4);
+        }
+        .google-btn:hover { transform: scale(1.1); }
+        .google-btn:active { transform: scale(0.95); }
+        
+        /* Touch Zones */
+        .touch-zone {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 50%;
+            z-index: 20;
+        }
+        .touch-zone-left { left: 0; cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><text y="20" font-size="20">❤️</text></svg>') 16 16, auto; }
+        .touch-zone-right { right: 0; cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><text y="20" font-size="20">😾</text></svg>') 16 16, auto; }
+        
+        /* Mouth Touch Zone - Invisible but clickable */
+        .mouth-zone {
+            position: absolute;
+            width: 60px;
+            height: 40px;
+            left: 50%;
+            top: 58%;
+            transform: translate(-50%, -50%);
+            z-index: 25;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .mouth-zone:active { background: rgba(255,255,255,0.1); }
+        
+        /* Auto Listen Indicator */
+        .auto-listen-indicator {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+        }
+        .auto-listen-indicator.show { opacity: 1; }
+        
+        /* Hearts & Tears */
         .heart-particle {
             position: absolute;
             color: #ec4899;
@@ -83,8 +195,7 @@
         }
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(0); }
-            50% { transform: translateY(-60px) scale(1.2); }
-            100% { opacity: 0; transform: translateY(-120px) scale(0.5); }
+            100% { opacity: 0; transform: translateY(-100px) scale(0.5); }
         }
         
         .tear {
@@ -92,61 +203,30 @@
             width: 10px;
             height: 14px;
             background: #60a5fa;
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            border-radius: 50%;
             animation: fall 1.2s linear forwards;
             z-index: 50;
         }
         @keyframes fall { to { transform: translateY(80px); opacity: 0; } }
         
-        /* Interaction Zones Overlay */
-        .touch-zone {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 50%;
-            z-index: 20;
-            cursor: pointer;
-        }
-        .touch-zone-left { left: 0; }
-        .touch-zone-right { right: 0; }
-        
-        .zone-indicator {
-            position: absolute;
-            top: 30%;
-            font-size: 40px;
-            opacity: 0;
-            transition: all 0.3s;
-            pointer-events: none;
-            z-index: 15;
-        }
-        .zone-left-indicator { left: 15%; }
-        .zone-right-indicator { right: 15%; }
-        
-        .touch-zone:active + .zone-indicator,
-        .touch-zone-left:active ~ .zone-left-indicator,
-        .touch-zone-right:active ~ .zone-right-indicator {
-            opacity: 1;
-            transform: scale(1.3);
-        }
-        
-        /* Listening State */
+        /* Listening Ring */
         .is-listening #cat-wrapper::after {
             content: '';
             position: absolute;
             inset: -20px;
-            border: 4px solid #6366f1;
+            border: 3px solid #10b981;
             border-radius: 50%;
             animation: pulseRing 1.5s infinite;
             pointer-events: none;
         }
         @keyframes pulseRing {
             0% { transform: scale(0.9); opacity: 1; }
-            100% { transform: scale(1.4); opacity: 0; }
+            100% { transform: scale(1.3); opacity: 0; }
         }
         
-        /* Mobile */
         @media (max-width: 640px) {
             #cat-wrapper { transform: scale(0.9); }
+            #browser-panel { max-width: 100%; }
         }
     </style>
 </head>
@@ -154,37 +234,67 @@
 
     <div id="overlay" onclick="toggleSidebar()"></div>
 
+    <!-- Sidebar -->
     <aside id="sidebar" class="fixed inset-y-0 left-0 w-72 bg-white/95 backdrop-blur shadow-2xl transform -translate-x-full">
         <div class="p-6 h-full flex flex-col">
             <h2 class="text-xl font-black text-indigo-600 mb-8 italic">SETTINGS</h2>
             <div class="space-y-6 flex-1">
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">OpenRouter API Key</label>
-                    <input type="password" id="api-key" placeholder="sk-or-..." class="w-full mt-2 p-3 bg-gray-100 rounded-xl border-none text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="password" id="api-key" placeholder="sk-or-..." class="w-full mt-2 p-3 bg-gray-100 rounded-xl border-none text-sm outline-none">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Model ID</label>
-                    <input type="text" id="model-profile" value="google/gemini-2.0-flash-exp:free" class="w-full mt-2 p-3 bg-gray-100 rounded-xl border-none text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="model-profile" value="google/gemini-2.0-flash-exp:free" class="w-full mt-2 p-3 bg-gray-100 rounded-xl border-none text-sm outline-none">
+                </div>
+                <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                    <p class="text-[10px] font-bold text-indigo-700 uppercase mb-2">Commands:</p>
+                    <p class="text-xs text-indigo-600">"Open Google" → Opens browser</p>
+                    <p class="text-xs text-indigo-600">"Close Google" → Closes browser</p>
+                    <p class="text-xs text-indigo-600">Tap mouth while speaking → Stop talking</p>
                 </div>
             </div>
-            <button onclick="saveSettings()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 transition-colors">Save Config</button>
+            <button onclick="saveSettings()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg">Save Config</button>
         </div>
     </aside>
 
+    <!-- In-App Browser Panel -->
+    <div id="browser-panel">
+        <div class="browser-header">
+            <button onclick="closeBrowser()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors">
+                <i class="fas fa-times text-gray-600"></i>
+            </button>
+            <div class="flex-1 bg-white rounded-full px-4 py-2 text-sm text-gray-600 truncate" id="browser-url">google.com</div>
+            <button onclick="toggleFullscreen()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors">
+                <i class="fas fa-expand text-gray-600" id="fullscreen-icon"></i>
+            </button>
+        </div>
+        <iframe id="browser-frame" class="browser-frame" src="about:blank"></iframe>
+    </div>
+
+    <!-- Google Popup -->
+    <div class="google-popup" id="google-popup">
+        <div class="google-btn" onclick="openGoogle()">
+            <i class="fab fa-google"></i>
+        </div>
+        <span class="text-xs font-bold text-gray-600">Open Google</span>
+    </div>
+
+    <!-- Main Content -->
     <main class="flex flex-col h-full relative">
         <header class="p-4 flex gap-2 items-center pointer-events-none z-50">
-            <button onclick="toggleSidebar()" class="pointer-events-auto w-10 h-10 bg-white rounded-xl shadow text-indigo-600 hover:bg-indigo-50 transition-colors">
+            <button onclick="toggleSidebar()" class="pointer-events-auto w-10 h-10 bg-white rounded-xl shadow text-indigo-600">
                 <i class="fas fa-cog"></i>
             </button>
             <div class="pointer-events-auto flex-1 bg-white/90 backdrop-blur rounded-xl shadow p-1 flex items-center h-10">
-                <input type="text" id="text-input" placeholder="Type or use voice..." class="flex-1 bg-transparent px-3 text-sm outline-none border-none" onkeydown="if(event.key==='Enter') sendText()">
-                <button onclick="sendText()" class="w-8 h-8 bg-indigo-600 text-white rounded-lg flex items-center justify-center hover:bg-indigo-700 transition-colors">
+                <input type="text" id="text-input" placeholder="Type or speak..." class="flex-1 bg-transparent px-3 text-sm outline-none border-none" onkeydown="if(event.key==='Enter') sendText()">
+                <button onclick="sendText()" class="w-8 h-8 bg-indigo-600 text-white rounded-lg flex items-center justify-center">
                     <i class="fas fa-paper-plane text-[10px]"></i>
                 </button>
             </div>
         </header>
 
-        <div class="flex-1 flex flex-col items-center justify-center relative overflow-hidden">
+        <div class="flex-1 flex flex-col items-center justify-center relative">
             <!-- Speech Bubble -->
             <div id="speech-bubble" style="left: 50%; top: 40px; transform: translateX(-50%);">
                 <div class="bg-white/95 backdrop-blur p-4 rounded-[2rem] shadow-xl border border-white/50">
@@ -195,59 +305,42 @@
                 </div>
             </div>
 
-            <!-- Cat Container with Touch Zones -->
-            <div id="cat-container" class="relative flex items-center justify-center" style="width: 300px; height: 350px;">
+            <!-- Cat -->
+            <div id="cat-container" class="relative flex items-center justify-center" style="width: 300px; height: 380px;">
                 <div id="cat-wrapper">
                     <!-- Touch Zones -->
-                    <div class="touch-zone touch-zone-left" onmousedown="startPet()" onmouseup="endPet()" ontouchstart="startPet()" ontouchend="endPet()"></div>
-                    <div class="touch-zone touch-zone-right" onmousedown="startScold()" onmouseup="endScold()" ontouchstart="startScold()" ontouchend="endScold()"></div>
+                    <div class="touch-zone touch-zone-left" onclick="handlePet()"></div>
+                    <div class="touch-zone touch-zone-right" onclick="handleScold()"></div>
                     
-                    <!-- Zone Indicators -->
-                    <div class="zone-indicator zone-left-indicator">❤️</div>
-                    <div class="zone-indicator zone-right-indicator">😾</div>
-
-                    <svg viewBox="0 0 200 240" class="w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80">
-                        <!-- Shadow -->
+                    <!-- Mouth Touch Zone (Stop Speaking) -->
+                    <div class="mouth-zone" onclick="stopSpeaking()" title="Tap to stop speaking"></div>
+                    
+                    <svg viewBox="0 0 200 240" class="w-64 h-64 sm:w-72 sm:h-72">
                         <ellipse cx="100" cy="230" rx="70" ry="12" fill="#000" opacity="0.08" />
-                        
-                        <!-- Tail -->
                         <path id="tail" d="M160 200 Q185 170 175 140 Q165 110 180 95" stroke="#4338ca" stroke-width="14" fill="none" stroke-linecap="round" />
-                        
-                        <!-- Body -->
                         <ellipse cx="100" cy="190" rx="55" ry="45" fill="#6366f1" />
                         <path d="M60 220 Q100 160 140 220" fill="#4f46e5" />
-                        
-                        <!-- Paws -->
                         <ellipse cx="70" cy="225" rx="15" ry="10" fill="#e0e7ff" />
                         <ellipse cx="130" cy="225" rx="15" ry="10" fill="#e0e7ff" />
                         
-                        <!-- Head Group -->
                         <g id="head-group" style="transform-origin: 100px 100px;">
-                            <!-- Ears -->
                             <path d="M50 50 L25 5 L70 35 Z" fill="#4338ca" />
                             <path d="M150 50 L175 5 L130 35 Z" fill="#4338ca" />
                             <path d="M58 42 L42 18 L68 32 Z" fill="#818cf8" />
                             <path d="M142 42 L158 18 L132 32 Z" fill="#818cf8" />
-                            
-                            <!-- Face -->
                             <circle cx="100" cy="110" r="85" fill="#6366f1" />
                             <ellipse cx="100" cy="125" rx="65" ry="55" fill="#e0e7ff" />
                             
-                            <!-- Eyes -->
-                            <g id="eyes" style="transform-origin: center;">
+                            <g id="eyes">
                                 <ellipse class="eye-lid" cx="75" cy="115" rx="10" ry="10" fill="#1e293b" />
                                 <ellipse class="eye-lid" cx="125" cy="115" rx="10" ry="10" fill="#1e293b" />
                                 <circle cx="78" cy="112" r="4" fill="white" opacity="0.7" />
                                 <circle cx="128" cy="112" r="4" fill="white" opacity="0.7" />
                             </g>
                             
-                            <!-- Nose -->
                             <path d="M92 140 L108 140 L100 150 Z" fill="#f472b6" />
-                            
-                            <!-- Mouth -->
                             <path id="mouth" d="M85 155 Q100 165 115 155" stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round" />
                             
-                            <!-- Whiskers -->
                             <g stroke="#1e293b" stroke-width="1.5" opacity="0.5">
                                 <line x1="35" y1="125" x2="70" y2="130" />
                                 <line x1="32" y1="140" x2="70" y2="140" />
@@ -256,30 +349,28 @@
                                 <line x1="168" y1="140" x2="130" y2="140" />
                                 <line x1="165" y1="155" x2="130" y2="150" />
                             </g>
-                            
-                            <!-- Cheeks -->
-                            <circle cx="60" cy="140" r="10" fill="#f472b6" opacity="0.25" />
-                            <circle cx="140" cy="140" r="10" fill="#f472b6" opacity="0.25" />
                         </g>
                     </svg>
+                    
+                    <div class="auto-listen-indicator" id="auto-listen-badge">
+                        <i class="fas fa-magic mr-1"></i> Auto-Listening...
+                    </div>
                 </div>
             </div>
 
             <!-- Controls -->
             <div class="absolute bottom-12 flex flex-col items-center gap-3 z-50">
                 <div class="flex gap-3 items-center">
-                    <button onclick="manualEmotion('love')" class="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 active:scale-95 transition-transform">🥰</button>
-                    
-                    <button id="mic-btn" onclick="toggleMic()" class="w-16 h-16 bg-white rounded-full shadow-2xl flex items-center justify-center text-2xl active:scale-90 transition-all duration-200">
+                    <button onclick="manualEmotion('love')" class="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 transition-transform">🥰</button>
+                    <button id="mic-btn" onclick="toggleMic()" class="w-16 h-16 bg-white rounded-full shadow-2xl flex items-center justify-center text-2xl active:scale-90 transition-all">
                         <i id="mic-icon" class="fas fa-microphone text-gray-300"></i>
                     </button>
-                    
-                    <button onclick="manualEmotion('sad')" class="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 active:scale-95 transition-transform">😿</button>
+                    <button onclick="manualEmotion('sad')" class="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 transition-transform">😿</button>
                 </div>
                 <div class="flex gap-2 items-center bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow text-xs font-bold">
                     <span id="status-tag" class="text-gray-500">READY</span>
                     <span class="text-gray-300">|</span>
-                    <span id="emotion-tag" class="text-indigo-600">NEUTRAL</span>
+                    <span id="mode-tag" class="text-emerald-500">AUTO-LISTEN</span>
                 </div>
             </div>
         </div>
@@ -290,111 +381,97 @@
             listening: false,
             speaking: false,
             emotion: 'neutral',
+            autoListen: true,
             config: {
                 key: localStorage.getItem('cat_key') || '',
                 model: localStorage.getItem('cat_model') || 'google/gemini-2.0-flash-exp:free'
-            },
-            petTimer: null,
-            scoldTimer: null,
-            lastSpeechTime: 0
+            }
         };
 
         const EMOTIONS = {
             neutral: { class: '', bn: 'হ্যালো!', en: 'Hello!' },
-            happy: { class: 'emotion-happy', bn: 'খুশি!', en: 'So happy!' },
+            happy: { class: 'emotion-happy', bn: 'খুশি!', en: 'Happy!' },
             love: { class: 'emotion-love', bn: 'ভালোবাসি!', en: 'Love you!' },
             sad: { class: 'emotion-sad', bn: 'দুঃখিত...', en: 'Sorry...' },
-            angry: { class: 'emotion-angry', bn: 'রাগান্বিত!', en: 'Angry!' },
-            scared: { class: 'emotion-scared', bn: 'ভয় পেয়েছি!', en: 'Scared!' }
+            angry: { class: 'emotion-angry', bn: 'রাগান্বিত!', en: 'Angry!' }
         };
 
-        // --- TOUCH INTERACTIONS (FIXED) ---
-        function startPet() {
-            clearTimeout(STATE.petTimer);
+        // --- TOUCH INTERACTIONS ---
+        function handlePet() {
             setEmotion('love');
             createHearts();
-            STATE.petTimer = setTimeout(() => {
-                speak("Purr... I love you!", "গুরুগুরু... আমি তোমাকে ভালোবাসি!");
-            }, 300);
+            speak("Purr... I love you!", "গুরুগুরু... তোমাকে ভালোবাসি!");
         }
 
-        function endPet() {
-            clearTimeout(STATE.petTimer);
-        }
-
-        function startScold() {
-            clearTimeout(STATE.scoldTimer);
-            setEmotion('angry');
-            STATE.scoldTimer = setTimeout(() => {
-                setEmotion('sad');
-                createTears();
-                speak("Meow... why scold me?", "মিউ... কেন বকছো?");
-            }, 600);
-        }
-
-        function endScold() {
-            clearTimeout(STATE.scoldTimer);
+        function handleScold() {
+            setEmotion('sad');
+            createTears();
+            speak("Meow... why scold me?", "মিউ... কেন বকছো?");
         }
 
         function manualEmotion(emo) {
             setEmotion(emo);
             if (emo === 'love') {
                 createHearts();
-                speak("Purr purr!", "গুরুগুরু!");
-            } else if (emo === 'sad') {
+                speak("Purr!", "গুরুগুরু!");
+            } else {
                 createTears();
-                speak("Don't be sad...", "দুঃখিত হোয়ো না...");
+                speak("Don't be sad!", "দুঃখিত হোয়ো না!");
+            }
+        }
+
+        function stopSpeaking() {
+            if (STATE.speaking) {
+                window.speechSynthesis.cancel();
+                STATE.speaking = false;
+                document.body.classList.remove('is-speaking');
+                document.getElementById('mouth').setAttribute('d', 'M85 155 Q100 165 115 155');
+                updateUI('STANDBY');
+                document.getElementById('status-tag').innerText = 'STOPPED';
+                
+                // Auto restart listening if enabled
+                if (STATE.autoListen) {
+                    setTimeout(() => startListening(), 500);
+                }
             }
         }
 
         // --- EMOTION SYSTEM ---
         function setEmotion(emotion) {
             const wrapper = document.getElementById('cat-wrapper');
-            const tag = document.getElementById('emotion-tag');
-            
             Object.keys(EMOTIONS).forEach(e => wrapper.classList.remove(EMOTIONS[e].class));
-            
             STATE.emotion = emotion;
             wrapper.classList.add(EMOTIONS[emotion].class);
-            tag.innerText = emotion.toUpperCase();
-            
-            // Update caption for manual emotions
-            if (EMOTIONS[emotion]) {
-                document.getElementById('ai-caption').innerText = EMOTIONS[emotion].bn;
-                document.getElementById('english-sub').innerText = EMOTIONS[emotion].en;
-            }
         }
 
         function createHearts() {
             const container = document.getElementById('cat-container');
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 5; i++) {
                 setTimeout(() => {
                     const heart = document.createElement('div');
                     heart.className = 'heart-particle';
-                    heart.innerHTML = ['💕', '💖', '💗'][Math.floor(Math.random() * 3)];
+                    heart.innerHTML = '💕';
                     heart.style.left = (60 + Math.random() * 80) + 'px';
-                    heart.style.top = (80 + Math.random() * 40) + 'px';
+                    heart.style.top = '100px';
                     container.appendChild(heart);
                     setTimeout(() => heart.remove(), 1500);
-                }, i * 150);
+                }, i * 100);
             }
         }
 
         function createTears() {
             const eyes = document.getElementById('eyes');
-            for (let i = 0; i < 3; i++) {
-                setTimeout(() => {
-                    const tear = document.createElement('div');
-                    tear.className = 'tear';
-                    tear.style.left = (i % 2 === 0 ? 70 : 120) + 'px';
-                    tear.style.top = '125px';
-                    eyes.appendChild(tear);
-                    setTimeout(() => tear.remove(), 1200);
-                }, i * 300);
+            for (let i = 0; i < 2; i++) {
+                const tear = document.createElement('div');
+                tear.className = 'tear';
+                tear.style.left = (i === 0 ? 70 : 120) + 'px';
+                tear.style.top = '125px';
+                eyes.appendChild(tear);
+                setTimeout(() => tear.remove(), 1200);
             }
         }
 
-        // --- SPEECH RECOGNITION (BUG FIX: Stop listening while speaking) ---
+        // --- SPEECH RECOGNITION WITH AUTO-LISTEN ---
         const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
         let rec = null;
         
@@ -409,78 +486,132 @@
                 updateUI('LISTENING');
                 document.body.classList.add('is-listening');
                 document.getElementById('status-tag').innerText = 'LISTENING';
+                document.getElementById('auto-listen-badge').classList.remove('show');
             };
             
             rec.onresult = (e) => {
                 const txt = e.results[0][0].transcript;
                 document.getElementById('user-transcript').innerText = '"' + txt + '"';
-                // Stop listening immediately after getting result
                 rec.stop();
-                STATE.listening = false;
-                document.body.classList.remove('is-listening');
-                callAI(txt);
+                processCommand(txt);
             };
             
             rec.onend = () => {
                 STATE.listening = false;
                 document.body.classList.remove('is-listening');
-                // Only auto-restart if not speaking and user wants mic on
-                // But we disabled auto-restart to prevent hearing itself
+                
+                // Auto restart if enabled and not speaking
+                if (STATE.autoListen && !STATE.speaking) {
+                    setTimeout(() => startListening(), 300);
+                }
             };
-            
-            rec.onerror = (e) => {
-                console.log('Speech error:', e.error);
-                STATE.listening = false;
-                document.body.classList.remove('is-listening');
-                updateUI('STANDBY');
-            };
+        }
+
+        function startListening() {
+            if (!rec || STATE.listening || STATE.speaking) return;
+            try {
+                rec.start();
+            } catch(e) {}
+        }
+
+        function stopListening() {
+            if (rec) rec.stop();
+            STATE.autoListen = false;
+            document.getElementById('mode-tag').innerText = 'MANUAL';
+            document.getElementById('mode-tag').className = 'text-gray-500';
         }
 
         function toggleMic() {
-            if (!rec) {
-                alert("Speech recognition not supported!");
-                return;
-            }
+            if (!rec) return alert("Speech recognition not supported!");
             
             if (STATE.listening) {
                 rec.stop();
-                STATE.listening = false;
-                updateUI('STANDBY');
+                STATE.autoListen = !STATE.autoListen;
+                document.getElementById('mode-tag').innerText = STATE.autoListen ? 'AUTO-LISTEN' : 'MANUAL';
+                document.getElementById('mode-tag').className = STATE.autoListen ? 'text-emerald-500' : 'text-gray-500';
             } else {
-                // Don't start if currently speaking
-                if (STATE.speaking) {
-                    window.speechSynthesis.cancel();
-                    STATE.speaking = false;
-                }
-                rec.start();
+                STATE.autoListen = true;
+                document.getElementById('mode-tag').innerText = 'AUTO-LISTEN';
+                document.getElementById('mode-tag').className = 'text-emerald-500';
+                startListening();
             }
         }
 
-        // --- AI & SPEECH (OpenRouter) ---
+        // --- COMMAND PROCESSING ---
+        function processCommand(text) {
+            const lower = text.toLowerCase();
+            
+            // Browser commands
+            if (lower.includes('open google') || lower.includes('google open') || lower.includes('গুগল খোলো')) {
+                showGooglePopup();
+                return;
+            }
+            if (lower.includes('close google') || lower.includes('google close') || lower.includes('গুগল বন্ধ')) {
+                closeBrowser();
+                return;
+            }
+            
+            // Emotion detection
+            if (lower.includes('love') || lower.includes('like')) setEmotion('love');
+            else if (lower.includes('bad') || lower.includes('angry')) setEmotion('angry');
+            else if (lower.includes('sad') || lower.includes('cry')) setEmotion('sad');
+            
+            callAI(text);
+        }
+
+        // --- BROWSER SYSTEM ---
+        function showGooglePopup() {
+            const popup = document.getElementById('google-popup');
+            popup.classList.add('active');
+            speak("Opening Google. Tap the icon!", "গুগল খুলছি। আইকনে ট্যাপ করো!");
+            
+            // Auto open after 3 seconds if not tapped
+            setTimeout(() => {
+                if (popup.classList.contains('active')) {
+                    openGoogle();
+                }
+            }, 3000);
+        }
+
+        function openGoogle() {
+            document.getElementById('google-popup').classList.remove('active');
+            const panel = document.getElementById('browser-panel');
+            const frame = document.getElementById('browser-frame');
+            panel.classList.add('active');
+            frame.src = 'https://www.google.com';
+            document.getElementById('browser-url').innerText = 'google.com';
+        }
+
+        function closeBrowser() {
+            const panel = document.getElementById('browser-panel');
+            panel.classList.remove('active');
+            document.getElementById('browser-frame').src = 'about:blank';
+            if (STATE.autoListen) startListening();
+        }
+
+        function toggleFullscreen() {
+            const panel = document.getElementById('browser-panel');
+            const icon = document.getElementById('fullscreen-icon');
+            panel.classList.toggle('fullscreen');
+            
+            if (panel.classList.contains('fullscreen')) {
+                icon.className = 'fas fa-compress';
+            } else {
+                icon.className = 'fas fa-expand';
+            }
+        }
+
+        // --- AI API ---
         async function callAI(text) {
             if (!STATE.config.key) {
-                alert("Please add your OpenRouter API Key!");
                 toggleSidebar();
-                return;
+                return alert("Please add OpenRouter API Key!");
             }
 
             updateUI('THINKING');
             document.getElementById('status-tag').innerText = 'THINKING';
 
-            // Detect emotion from text
-            const lower = text.toLowerCase();
-            if (lower.includes('love') || lower.includes('like') || lower.includes('good')) {
-                setEmotion('love');
-            } else if (lower.includes('bad') || lower.includes('stupid') || lower.includes('hate')) {
-                setEmotion('sad');
-                setTimeout(() => createTears(), 500);
-            } else if (lower.includes('sorry') || lower.includes('apologize')) {
-                setEmotion('love');
-                createHearts();
-            }
-
-            const prompt = `You are a cute robot cat. Reply in English (1 short sentence), then add Bangla translation on new line starting with "BN:".
-            User said: "${text}"`;
+            const prompt = `You are a cute robot cat. Reply in English (short), then add Bangla translation starting with "BN:". User: "${text}"`;
 
             try {
                 const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -500,12 +631,10 @@
                 const data = await res.json();
                 const reply = data.choices[0].message.content;
                 
-                // Parse response
                 const lines = reply.split('\n').filter(l => l.trim());
                 let english = lines[0].replace(/^EN:\s*/i, '').trim();
-                let bangla = lines.find(l => l.toUpperCase().startsWith('BN:'))?.replace(/^BN:\s*/i, '').trim() ||
-                            lines[1]?.replace(/^BN:\s*/i, '').trim() ||
-                            "বুঝতে পারিনি";
+                let bangla = lines.find(l => l.toUpperCase().includes('BN:'))?.replace(/^BN:\s*/i, '').trim() ||
+                            lines[1]?.replace(/^BN:\s*/i, '').trim() || "বুঝতে পারিনি";
                 
                 document.getElementById('ai-caption').innerText = bangla;
                 document.getElementById('english-sub').innerText = english;
@@ -513,16 +642,13 @@
                 speak(english, bangla);
                 
             } catch (e) {
-                console.error(e);
                 updateUI('STANDBY');
-                document.getElementById('status-tag').innerText = 'ERROR';
-                speak("Meow! Error!", "মিউ! সমস্যা!");
+                speak("Error!", "সমস্যা!");
             }
         }
 
         function speak(english, bangla) {
             STATE.speaking = true;
-            STATE.lastSpeechTime = Date.now();
             window.speechSynthesis.cancel();
             
             const ut = new SpeechSynthesisUtterance(english);
@@ -538,11 +664,10 @@
                 document.body.classList.add('is-speaking');
                 document.getElementById('status-tag').innerText = 'SPEAKING';
                 
-                // Animate mouth
                 mouthAnim = setInterval(() => {
                     const open = Math.random() > 0.3;
-                    mouth.setAttribute('d', open ? 'M85 155 Q100 170 115 155' : 'M85 155 Q100 160 115 155');
-                }, 80);
+                    mouth.setAttribute('d', open ? 'M85 155 Q100 175 115 155' : 'M85 155 Q100 165 115 155');
+                }, 100);
             };
             
             ut.onend = () => {
@@ -561,11 +686,9 @@
             const input = document.getElementById('text-input');
             const txt = input.value.trim();
             if (!txt) return;
-            
             document.getElementById('user-transcript').innerText = '"' + txt + '"';
-            callAI(txt);
+            processCommand(txt);
             input.value = '';
-            input.blur();
         }
 
         // --- UI HELPERS ---
@@ -574,17 +697,17 @@
             const btn = document.getElementById('mic-btn');
             
             if (status === 'LISTENING') {
-                icon.className = "fas fa-microphone text-indigo-600 animate-pulse";
-                btn.classList.add('ring-4', 'ring-indigo-300');
+                icon.className = "fas fa-microphone text-emerald-500 animate-pulse";
+                btn.classList.add('ring-4', 'ring-emerald-200');
             } else if (status === 'SPEAKING') {
-                icon.className = "fas fa-volume-up text-green-500";
-                btn.classList.remove('ring-4', 'ring-indigo-300');
+                icon.className = "fas fa-volume-up text-indigo-500";
+                btn.classList.remove('ring-4', 'ring-emerald-200');
             } else if (status === 'THINKING') {
                 icon.className = "fas fa-circle-notch fa-spin text-orange-500";
-                btn.classList.remove('ring-4', 'ring-indigo-300');
+                btn.classList.remove('ring-4', 'ring-emerald-200');
             } else {
                 icon.className = "fas fa-microphone text-gray-300";
-                btn.classList.remove('ring-4', 'ring-indigo-300');
+                btn.classList.remove('ring-4', 'ring-emerald-200');
             }
         }
 
@@ -616,16 +739,12 @@
             document.getElementById('drag-handle').onpointerdown = (e) => {
                 startX = e.clientX - px;
                 startY = e.clientY - py;
-                
                 document.onpointermove = (ev) => {
                     px = ev.clientX - startX;
                     py = ev.clientY - startY;
                     bubble.style.transform = `translate3d(calc(-50% + ${px}px), ${py}px, 0)`;
                 };
-                
-                document.onpointerup = () => {
-                    document.onpointermove = null;
-                };
+                document.onpointerup = () => document.onpointermove = null;
             };
             
             // Auto blink
@@ -634,11 +753,8 @@
                 setTimeout(() => document.getElementById('eyes').classList.remove('blink'), 150);
             }, 4000);
             
-            // Welcome
-            setTimeout(() => {
-                speak("Hello! Tap left to pet, right to scold!", 
-                      "হ্যালো! বামে ট্যাপ করো আদর করতে, ডানে বকাঝকা করতে!");
-            }, 800);
+            // Start auto-listen
+            setTimeout(() => startListening(), 1000);
         };
     </script>
 </body>
