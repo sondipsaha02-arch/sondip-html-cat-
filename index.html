@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Cat | Smart Companion</title>
+    <title>AI Cat | Universal Companion</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&family=Inter:wght@400;600;800&display=swap');
         
-        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        * { 
+            -webkit-tap-highlight-color: transparent; 
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         
         :root {
             --primary: #6366f1;
@@ -22,41 +27,54 @@
             overflow: hidden; 
             height: 100vh;
             height: 100dvh;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 50%, #ddd6fe 100%);
         }
-        
-        /* ========== DEVICE DETECTION ========== */
-        /* Mobile Version (default) */
-        .mobile-view {
+
+        /* ========== UNIFIED UI (Mobile-style for both) ========== */
+        .app-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            max-width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        @media (min-width: 1024px) {
+            .app-container {
+                max-width: 600px;
+                box-shadow: 0 0 60px rgba(0,0,0,0.1);
+            }
+        }
+
+        /* PC override - wider layout */
+        .pc-mode .app-container {
+            max-width: 100%;
+            flex-direction: row;
+        }
+
+        .pc-mode .main-content {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
             height: 100%;
-            max-width: 100%;
-            margin: 0 auto;
         }
-        
-        /* PC Version */
-        .pc-view {
-            display: none;
-            height: 100%;
-            width: 100%;
-        }
-        
-        @media (min-width: 1024px) {
-            .mobile-view { display: none !important; }
-            .pc-view { display: flex !important; }
-        }
-        
-        /* ========== MOBILE STYLES ========== */
-        .mobile-header {
+
+        /* ========== HEADER WITH INPUT ========== */
+        .top-header {
             padding: 12px 16px;
             display: flex;
             align-items: center;
             gap: 12px;
-            z-index: 50;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.5);
         }
-        
-        .mobile-input-bar {
+
+        .input-bar {
             flex: 1;
             background: white;
             border-radius: 25px;
@@ -65,17 +83,18 @@
             align-items: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        
-        .mobile-input {
+
+        .text-input {
             flex: 1;
             border: none;
             background: transparent;
             padding: 12px 16px;
             font-size: 16px;
             outline: none;
+            font-family: inherit;
         }
-        
-        .mobile-send-btn {
+
+        .send-btn {
             width: 40px;
             height: 40px;
             background: var(--primary);
@@ -86,9 +105,22 @@
             justify-content: center;
             border: none;
             margin-right: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
-        
-        .mobile-cat-area {
+        .send-btn:active { transform: scale(0.95); }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ========== CAT STAGE ========== */
+        .cat-stage {
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -96,114 +128,57 @@
             justify-content: center;
             position: relative;
             padding: 20px;
+            min-height: 0;
         }
-        
-        .mobile-controls {
-            padding: 20px;
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
-            background: linear-gradient(to top, rgba(255,255,255,0.95), transparent);
-        }
-        
-        /* ========== PC STYLES ========== */
-        .pc-sidebar {
-            width: 350px;
-            background: white;
-            border-right: 1px solid #e5e7eb;
-            display: flex;
-            flex-direction: column;
-            padding: 24px;
-            overflow-y: auto;
-        }
-        
-        .pc-main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-        
-        .pc-header {
-            padding: 20px 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .pc-input-area {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 600px;
-            max-width: 90%;
-            background: white;
-            border-radius: 30px;
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            z-index: 100;
-        }
-        
-        .pc-cat-stage {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        
-        /* ========== CAT ANIMATIONS ========== */
+
         #cat-wrapper {
             position: relative;
+            width: 280px;
+            height: 320px;
             transition: all 0.3s ease;
         }
-        
-        .mobile-view #cat-wrapper {
-            width: 260px;
-            height: 300px;
+
+        @media (min-width: 768px) {
+            #cat-wrapper {
+                width: 320px;
+                height: 360px;
+            }
         }
-        
-        .pc-view #cat-wrapper {
-            width: 380px;
-            height: 440px;
-        }
-        
-        /* Dance Animation */
+
+        /* ========== ANIMATIONS ========== */
         @keyframes dance-bounce {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-40px) rotate(-15deg); }
-            50% { transform: translateY(0) rotate(0deg); }
-            75% { transform: translateY(-40px) rotate(15deg); }
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            25% { transform: translateY(-40px) rotate(-15deg) scale(1.05); }
+            50% { transform: translateY(0) rotate(0deg) scale(1); }
+            75% { transform: translateY(-40px) rotate(15deg) scale(1.05); }
         }
-        
+
         @keyframes tail-dance {
             0%, 100% { transform: rotate(0deg); }
             25% { transform: rotate(60deg); }
             50% { transform: rotate(0deg); }
             75% { transform: rotate(-60deg); }
         }
-        
+
         .dancing {
             animation: dance-bounce 0.5s infinite !important;
         }
-        
+
         .dancing #tail {
-            animation: tail-dance 0.3s infinite !important;
+            animation: tail-dance 0.25s infinite !important;
         }
-        
-        /* Emotions */
+
         .emotion-happy { animation: happy-bounce 1s infinite; }
         @keyframes happy-bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-20px); }
         }
-        
+
         .emotion-sad { 
             transform: translateY(30px) scale(0.9); 
             filter: brightness(0.7); 
         }
-        
+
         .emotion-angry { 
             animation: angry-shake 0.4s infinite; 
             filter: hue-rotate(-40deg); 
@@ -213,7 +188,7 @@
             25% { transform: translateX(-10px) rotate(-5deg); }
             75% { transform: translateX(10px) rotate(5deg); }
         }
-        
+
         .emotion-love { 
             animation: love-pulse 0.8s infinite; 
         }
@@ -221,8 +196,7 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
         }
-        
-        /* Speaking */
+
         .is-speaking #head-group {
             animation: speak-wobble 0.3s infinite alternate;
         }
@@ -230,8 +204,7 @@
             from { transform: rotate(-5deg); }
             to { transform: rotate(5deg); }
         }
-        
-        /* Tail */
+
         #tail {
             transform-origin: 140px 160px;
             animation: tail-wag 2s infinite ease-in-out;
@@ -240,47 +213,74 @@
             0%, 100% { transform: rotate(0deg); }
             50% { transform: rotate(20deg); }
         }
-        
-        /* Listening */
+
+        /* ========== LISTENING STATES ========== */
         .listening-active #cat-wrapper::before {
             content: '';
             position: absolute;
-            inset: -40px;
+            inset: -30px;
             border: 4px solid #10b981;
             border-radius: 50%;
             animation: listen-pulse 1.5s infinite;
             z-index: -1;
         }
-        
+
         @keyframes listen-pulse {
             0% { transform: scale(0.8); opacity: 1; }
-            100% { transform: scale(1.5); opacity: 0; }
+            100% { transform: scale(1.4); opacity: 0; }
         }
-        
-        /* Speech Bubble */
+
+        /* ========== SPEECH BUBBLE ========== */
         .speech-bubble {
             position: absolute;
-            background: white;
-            padding: 20px;
-            border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            z-index: 100;
-        }
-        
-        .mobile-view .speech-bubble {
             top: 10px;
             left: 20px;
             right: 20px;
-            max-width: none;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            z-index: 50;
+            border: 1px solid rgba(255,255,255,0.5);
         }
-        
-        .pc-view .speech-bubble {
-            top: 40px;
-            left: 40px;
-            width: 400px;
+
+        .drag-handle {
+            width: 40px;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin: 0 auto 8px;
+            cursor: grab;
         }
-        
-        /* Touch Zones */
+        .drag-handle:active { cursor: grabbing; }
+
+        .user-text {
+            color: #6366f1;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            opacity: 0.7;
+        }
+
+        .caption {
+            color: #1f2937;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.4;
+            font-family: 'Noto Sans Bengali', 'Inter', sans-serif;
+        }
+
+        .subtitle {
+            color: #9ca3af;
+            font-size: 13px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e5e7eb;
+            font-style: italic;
+        }
+
+        /* ========== TOUCH ZONES ========== */
         .touch-zone {
             position: absolute;
             top: 0;
@@ -291,108 +291,165 @@
         }
         .touch-left { left: 0; }
         .touch-right { right: 0; }
-        
+
         .mouth-zone {
             position: absolute;
-            width: 100px;
-            height: 80px;
+            width: 80px;
+            height: 60px;
             left: 50%;
-            top: 55%;
+            top: 58%;
             transform: translate(-50%, -50%);
             z-index: 15;
             cursor: pointer;
             border-radius: 50%;
         }
-        
-        /* Mic Button */
-        .mic-btn {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+
+        /* ========== CONTROLS ========== */
+        .controls-area {
+            padding: 20px;
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            background: linear-gradient(to top, rgba(255,255,255,0.9), transparent);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .control-buttons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .control-btn {
+            width: 56px;
+            height: 56px;
             background: white;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
-            transition: all 0.3s;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .control-btn:active { transform: scale(0.95); }
+
+        .mic-btn {
+            width: 72px;
+            height: 72px;
+            font-size: 28px;
             position: relative;
         }
-        
+
         .mic-btn.listening {
             background: #10b981;
             color: white;
             animation: mic-pulse 1.5s infinite;
         }
-        
+
         @keyframes mic-pulse {
             0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            50% { box-shadow: 0 0 0 25px rgba(16, 185, 129, 0); }
+            50% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
         }
-        
-        /* Effects */
-        .heart-particle {
-            position: absolute;
-            font-size: 28px;
-            animation: float-up 1.5s ease-out forwards;
-            pointer-events: none;
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.9);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        
-        @keyframes float-up {
-            0% { opacity: 1; transform: translateY(0) scale(0); }
-            100% { opacity: 0; transform: translateY(-100px) scale(1); }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #9ca3af;
         }
-        
-        .music-note {
-            position: absolute;
-            font-size: 32px;
-            animation: note-float 2s ease-out forwards;
-        }
-        
-        @keyframes note-float {
-            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-            100% { opacity: 0; transform: translateY(-120px) rotate(360deg); }
-        }
-        
-        /* Settings Panel */
+        .status-dot.active { background: #10b981; animation: blink 1s infinite; }
+        .status-dot.speaking { background: var(--primary); animation: blink 0.3s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* ========== SETTINGS PANEL ========== */
         .settings-overlay {
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.5);
             backdrop-filter: blur(8px);
-            z-index: 1000;
+            z-index: 2000;
             display: none;
             opacity: 0;
             transition: opacity 0.3s;
+            overflow-y: auto;
         }
-        
-        .settings-overlay.active {
-            display: flex;
-            opacity: 1;
-        }
-        
+        .settings-overlay.active { display: block; opacity: 1; }
+
         .settings-panel {
             background: white;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            margin: auto;
-            border-radius: 24px;
+            min-height: 100%;
+            max-width: 600px;
+            margin: 0 auto;
             padding: 24px;
-            overflow-y: auto;
-            transform: scale(0.9);
-            transition: transform 0.3s;
         }
-        
-        .settings-overlay.active .settings-panel {
-            transform: scale(1);
+
+        @media (min-width: 640px) {
+            .settings-panel {
+                margin: 40px auto;
+                border-radius: 24px;
+                min-height: auto;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
         }
-        
-        /* Form Elements */
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        /* Device Switch */
+        .device-switch {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f3f4f6;
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .device-option {
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .device-option.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         .form-label {
             display: block;
             font-size: 12px;
@@ -402,7 +459,7 @@
             margin-bottom: 8px;
             letter-spacing: 0.5px;
         }
-        
+
         .form-input, .form-select {
             width: 100%;
             padding: 14px 18px;
@@ -411,413 +468,555 @@
             font-size: 15px;
             transition: all 0.2s;
             outline: none;
+            font-family: inherit;
         }
-        
+
         .form-input:focus, .form-select:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
         }
-        
-        .voice-option {
-            padding: 12px;
+
+        .custom-model-input {
+            margin-top: 8px;
+            display: none;
+        }
+        .custom-model-input.show { display: block; }
+
+        .voice-list {
+            max-height: 200px;
+            overflow-y: auto;
             border: 2px solid #e5e7eb;
             border-radius: 12px;
-            margin-bottom: 8px;
+            padding: 8px;
+        }
+
+        .voice-option {
+            padding: 12px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 12px;
+            margin-bottom: 4px;
         }
-        
-        .voice-option:hover {
-            border-color: var(--primary);
-            background: #f5f3ff;
-        }
-        
+
+        .voice-option:hover { background: #f9fafb; }
         .voice-option.selected {
-            border-color: var(--primary);
             background: #ede9fe;
+            border: 2px solid var(--primary);
         }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #c7c7c7;
-            border-radius: 4px;
-        }
-        
-        /* Status */
-        .status-bar {
+
+        .toggle-switch {
+            position: relative;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(255,255,255,0.9);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
         }
-        
-        .status-dot {
-            width: 8px;
-            height: 8px;
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            width: 50px;
+            height: 26px;
+            background: #e5e7eb;
+            border-radius: 26px;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
             border-radius: 50%;
-            background: #9ca3af;
+            top: 2px;
+            left: 2px;
+            transition: 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        .status-dot.active { background: #10b981; animation: blink 1s infinite; }
-        .status-dot.speaking { background: var(--primary); animation: blink 0.3s infinite; }
-        
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        input:checked + .toggle-slider {
+            background: var(--primary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* ========== INFO POPUP (Search Results) ========== */
+        .info-popup {
+            position: fixed;
+            right: -100%;
+            top: 0;
+            width: 100%;
+            max-width: 450px;
+            height: 100%;
+            background: white;
+            z-index: 1500;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.2);
+        }
+
+        .info-popup.active { right: 0; }
+
+        .info-header {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .info-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .info-card h3 {
+            color: #1a73e8;
+            font-size: 18px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .info-card p {
+            color: #4d5156;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .info-card .source {
+            color: #188038;
+            font-size: 13px;
+            margin-top: 12px;
+            font-weight: 500;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ========== QUICK LINKS POPUP ========== */
+        .quick-links-popup {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%) translateX(200px);
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 1400;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 200px;
+        }
+
+        .quick-links-popup.active {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .quick-link-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #f3f4f6;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .quick-link-btn:hover {
+            background: #e5e7eb;
+            transform: translateX(-5px);
+        }
+
+        .quick-link-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* ========== EFFECTS ========== */
+        .heart-particle {
+            position: absolute;
+            font-size: 28px;
+            animation: float-up 1.5s ease-out forwards;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes float-up {
+            0% { opacity: 1; transform: translateY(0) scale(0); }
+            100% { opacity: 0; transform: translateY(-100px) scale(1); }
+        }
+
+        .music-note {
+            position: absolute;
+            font-size: 32px;
+            animation: note-float 2s ease-out forwards;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes note-float {
+            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(-120px) rotate(360deg); }
+        }
+
+        /* ========== SCROLLBAR ========== */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
     </style>
 </head>
 <body>
 
-    <!-- Settings Overlay (Both Mobile & PC) -->
+    <!-- Settings Overlay -->
     <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings(event)">
         <div class="settings-panel" onclick="event.stopPropagation()">
-            <div class="flex items-center justify-between mb-6">
+            <div class="settings-header">
                 <div>
                     <h2 class="text-2xl font-black text-indigo-600">Settings</h2>
-                    <p class="text-sm text-gray-400">Customize your AI Cat</p>
+                    <p class="text-sm text-gray-500">Customize your experience</p>
                 </div>
-                <button onclick="closeSettings()" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
+                <button onclick="closeSettings()" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
-            <div class="space-y-6">
-                <!-- API Settings -->
-                <div class="p-4 bg-indigo-50 rounded-xl">
-                    <h3 class="font-bold text-indigo-900 mb-4 flex items-center gap-2">
-                        <i class="fas fa-robot"></i> AI Configuration
-                    </h3>
-                    
-                    <div class="form-group">
-                        <label class="form-label">OpenRouter API Key</label>
-                        <input type="password" id="apiKey" class="form-input" placeholder="sk-or-...">
+
+            <!-- Device Switch -->
+            <div class="form-group">
+                <label class="form-label">Device Mode</label>
+                <div class="device-switch">
+                    <div class="device-option active" id="mobileSwitch" onclick="switchDevice('mobile')">
+                        <i class="fas fa-mobile-alt"></i>
+                        Mobile
                     </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">AI Model</label>
-                        <select id="modelSelect" class="form-select">
-                            <option value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash (Free)</option>
-                            <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
-                            <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
-                            <option value="meta-llama/llama-3.1-8b-instruct">Llama 3.1 8B</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- Voice Settings -->
-                <div class="p-4 bg-pink-50 rounded-xl">
-                    <h3 class="font-bold text-pink-900 mb-4 flex items-center gap-2">
-                        <i class="fas fa-microphone"></i> Voice Settings
-                    </h3>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Select Voice</label>
-                        <div id="voiceList" class="max-h-48 overflow-y-auto">
-                            <div class="text-sm text-gray-500">Loading voices...</div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Speech Rate: <span id="rateValue">1.0</span></label>
-                        <input type="range" id="speechRate" min="0.5" max="2" step="0.1" value="1" class="w-full accent-indigo-600">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Pitch: <span id="pitchValue">1.2</span></label>
-                        <input type="range" id="speechPitch" min="0.5" max="2" step="0.1" value="1.2" class="w-full accent-indigo-600">
-                    </div>
-                </div>
-                
-                <!-- Behavior Settings -->
-                <div class="p-4 bg-emerald-50 rounded-xl">
-                    <h3 class="font-bold text-emerald-900 mb-4 flex items-center gap-2">
-                        <i class="fas fa-cog"></i> Behavior
-                    </h3>
-                    
-                    <div class="flex items-center justify-between p-3 bg-white rounded-xl mb-3">
-                        <div>
-                            <div class="font-semibold text-gray-800">Auto-Listen</div>
-                            <div class="text-xs text-gray-500">Start listening after speaking</div>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="autoListenToggle" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                        </label>
-                    </div>
-                    
-                    <div class="flex items-center justify-between p-3 bg-white rounded-xl">
-                        <div>
-                            <div class="font-semibold text-gray-800">Show English Subtitles</div>
-                            <div class="text-xs text-gray-500">Display English translation</div>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="subtitleToggle" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                        </label>
-                    </div>
-                </div>
-                
-                <!-- Language -->
-                <div class="p-4 bg-amber-50 rounded-xl">
-                    <h3 class="font-bold text-amber-900 mb-4 flex items-center gap-2">
-                        <i class="fas fa-language"></i> Language
-                    </h3>
-                    <div class="form-group">
-                        <label class="form-label">Response Language</label>
-                        <select id="langSelect" class="form-select">
-                            <option value="bn">Bengali (Bangla)</option>
-                            <option value="hi">Hindi</option>
-                            <option value="es">Spanish</option>
-                            <option value="fr">French</option>
-                            <option value="ja">Japanese</option>
-                        </select>
+                    <div class="device-option" id="pcSwitch" onclick="switchDevice('pc')">
+                        <i class="fas fa-desktop"></i>
+                        Desktop
                     </div>
                 </div>
             </div>
-            
-            <button onclick="saveSettings()" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg mt-6 shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">
+
+            <!-- AI Models -->
+            <div class="form-group">
+                <label class="form-label">AI Model</label>
+                <select id="modelSelect" class="form-select" onchange="handleModelChange()">
+                    <option value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash (Free)</option>
+                    <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                    <option value="anthropic/claude-3-opus">Claude 3 Opus</option>
+                    <option value="openai/gpt-4o">GPT-4o</option>
+                    <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+                    <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                    <option value="meta-llama/llama-3.1-70b-instruct">Llama 3.1 70B</option>
+                    <option value="meta-llama/llama-3.1-8b-instruct">Llama 3.1 8B</option>
+                    <option value="mistralai/mistral-7b-instruct">Mistral 7B</option>
+                    <option value="nousresearch/nous-hermes-2-mixtral-8x7b-sft">Nous Hermes 2 Mixtral</option>
+                    <option value="deepseek/deepseek-chat">DeepSeek Chat</option>
+                    <option value="perplexity/sonar">Perplexity Sonar</option>
+                    <option value="custom">Custom Model (Type below)</option>
+                </select>
+                <input type="text" id="customModel" class="form-input custom-model-input" placeholder="Enter custom model ID (e.g., openai/gpt-4)">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">OpenRouter API Key</label>
+                <input type="password" id="apiKey" class="form-input" placeholder="sk-or-...">
+            </div>
+
+            <!-- Voice Settings -->
+            <div class="p-4 bg-pink-50 rounded-xl mb-6">
+                <h3 class="font-bold text-pink-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-microphone"></i> Voice Settings
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Select Voice</label>
+                    <div class="voice-list" id="voiceList">
+                        <div class="text-sm text-gray-500 p-4 text-center">Loading voices...</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group mb-0">
+                        <label class="form-label">Rate: <span id="rateValue">1.0</span></label>
+                        <input type="range" id="speechRate" min="0.5" max="2" step="0.1" value="1" class="w-full accent-pink-600">
+                    </div>
+                    <div class="form-group mb-0">
+                        <label class="form-label">Pitch: <span id="pitchValue">1.2</span></label>
+                        <input type="range" id="speechPitch" min="0.5" max="2" step="0.1" value="1.2" class="w-full accent-pink-600">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toggles -->
+            <div class="space-y-4 mb-6">
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                    <div>
+                        <div class="font-semibold text-gray-800">Auto-Listen</div>
+                        <div class="text-xs text-gray-500">Continuous conversation mode</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="autoListenToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                    <div>
+                        <div class="font-semibold text-gray-800">Show Subtitles</div>
+                        <div class="text-xs text-gray-500">English translation below</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="subtitleToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Language -->
+            <div class="form-group">
+                <label class="form-label">Response Language</label>
+                <select id="langSelect" class="form-select">
+                    <option value="bn">Bengali (বাংলা)</option>
+                    <option value="hi">Hindi (हिन्दी)</option>
+                    <option value="ur">Urdu (اردو)</option>
+                    <option value="ta">Tamil (தமிழ்)</option>
+                    <option value="te">Telugu (తెలుగు)</option>
+                    <option value="es">Spanish (Español)</option>
+                    <option value="fr">French (Français)</option>
+                    <option value="de">German (Deutsch)</option>
+                    <option value="ja">Japanese (日本語)</option>
+                    <option value="ko">Korean (한국어)</option>
+                    <option value="zh">Chinese (中文)</option>
+                    <option value="ar">Arabic (العربية)</option>
+                    <option value="ru">Russian (Русский)</option>
+                </select>
+            </div>
+
+            <button onclick="saveSettings()" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">
                 Save Settings
             </button>
         </div>
     </div>
 
-    <!-- ==================== MOBILE VIEW ==================== -->
-    <div class="mobile-view" id="mobileView">
-        <!-- Header with Input -->
-        <div class="mobile-header">
-            <button onclick="openSettings()" class="w-12 h-12 bg-white rounded-full shadow flex items-center justify-center text-indigo-600">
+    <!-- Info Popup (Search Results) -->
+    <div class="info-popup" id="infoPopup">
+        <div class="info-header">
+            <button onclick="closeInfoPopup()" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <div class="flex items-center gap-3">
+                <i class="fab fa-google text-2xl"></i>
+                <div>
+                    <div class="font-bold text-lg">Search Results</div>
+                    <div class="text-sm opacity-90" id="searchQueryDisplay">Query</div>
+                </div>
+            </div>
+        </div>
+        <div class="info-content" id="infoContent">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Quick Links Popup -->
+    <div class="quick-links-popup" id="quickLinksPopup">
+        <h3 class="font-bold text-gray-800 text-center mb-2">Open App</h3>
+        <button class="quick-link-btn" onclick="openLink('https://www.google.com', 'Google')">
+            <div class="quick-link-icon bg-blue-100 text-blue-600"><i class="fab fa-google"></i></div>
+            <div>
+                <div class="font-semibold">Google</div>
+                <div class="text-xs text-gray-500">Search engine</div>
+            </div>
+        </button>
+        <button class="quick-link-btn" onclick="openLink('https://www.youtube.com', 'YouTube')">
+            <div class="quick-link-icon bg-red-100 text-red-600"><i class="fab fa-youtube"></i></div>
+            <div>
+                <div class="font-semibold">YouTube</div>
+                <div class="text-xs text-gray-500">Video platform</div>
+            </div>
+        </button>
+        <button class="quick-link-btn" onclick="openLink('https://www.facebook.com', 'Facebook')">
+            <div class="quick-link-icon bg-blue-100 text-blue-800"><i class="fab fa-facebook-f"></i></div>
+            <div>
+                <div class="font-semibold">Facebook</div>
+                <div class="text-xs text-gray-500">Social media</div>
+            </div>
+        </button>
+        <button class="quick-link-btn" onclick="openLink('https://www.instagram.com', 'Instagram')">
+            <div class="quick-link-icon bg-pink-100 text-pink-600"><i class="fab fa-instagram"></i></div>
+            <div>
+                <div class="font-semibold">Instagram</div>
+                <div class="text-xs text-gray-500">Photo sharing</div>
+            </div>
+        </button>
+        <button class="quick-link-btn" onclick="openLink('https://chat.openai.com', 'ChatGPT')">
+            <div class="quick-link-icon bg-green-100 text-green-600"><i class="fas fa-robot"></i></div>
+            <div>
+                <div class="font-semibold">ChatGPT</div>
+                <div class="text-xs text-gray-500">AI Chat</div>
+            </div>
+        </button>
+        <button class="quick-link-btn" onclick="openLink('https://gemini.google.com', 'Gemini')">
+            <div class="quick-link-icon bg-purple-100 text-purple-600"><i class="fas fa-gem"></i></div>
+            <div>
+                <div class="font-semibold">Gemini</div>
+                <div class="text-xs text-gray-500">Google AI</div>
+            </div>
+        </button>
+        <button class="quick-link-btn" onclick="openLink('https://www.wikipedia.org', 'Wikipedia')">
+            <div class="quick-link-icon bg-gray-100 text-gray-600"><i class="fab fa-wikipedia-w"></i></div>
+            <div>
+                <div class="font-semibold">Wikipedia</div>
+                <div class="text-xs text-gray-500">Encyclopedia</div>
+            </div>
+        </button>
+        <button class="quick-link-btn" onclick="openLink('https://claude.ai', 'Claude')">
+            <div class="quick-link-icon bg-orange-100 text-orange-600"><i class="fas fa-brain"></i></div>
+            <div>
+                <div class="font-semibold">Claude</div>
+                <div class="text-xs text-gray-500">Anthropic AI</div>
+            </div>
+        </button>
+        <button class="quick-link-btn" onclick="openLink('https://www.kimi.com', 'Kimi')">
+            <div class="quick-link-icon bg-indigo-100 text-indigo-600"><i class="fas fa-moon"></i></div>
+            <div>
+                <div class="font-semibold">Kimi</div>
+                <div class="text-xs text-gray-500">Moonshot AI</div>
+            </div>
+        </button>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="app-container" id="appContainer">
+        <!-- Top Header with Input -->
+        <div class="top-header">
+            <button onclick="openSettings()" class="w-12 h-12 bg-white rounded-full shadow flex items-center justify-center text-indigo-600 hover:bg-indigo-50 transition-colors">
                 <i class="fas fa-cog text-lg"></i>
             </button>
             
-            <div class="mobile-input-bar">
-                <input type="text" id="mobileInput" class="mobile-input" placeholder="Type or speak..." onkeydown="if(event.key==='Enter') sendMobileText()">
-                <button onclick="sendMobileText()" class="mobile-send-btn">
+            <div class="input-bar">
+                <input type="text" id="mainInput" class="text-input" placeholder="Type or speak..." onkeydown="if(event.key==='Enter') sendText()">
+                <button onclick="sendText()" class="send-btn">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
         </div>
-        
-        <!-- Cat Area -->
-        <div class="mobile-cat-area">
-            <!-- Speech Bubble -->
-            <div class="speech-bubble" id="mobileBubble">
-                <div class="flex items-center gap-2 mb-2">
-                    <div class="w-2 h-2 bg-gray-300 rounded-full cursor-move" id="mobileDrag"></div>
-                    <div class="flex-1 h-0.5 bg-gray-100"></div>
-                </div>
-                <p id="mobileUserText" class="text-indigo-500 text-xs font-bold mb-1 opacity-60"></p>
-                <p id="mobileCaption" class="text-gray-800 text-lg font-bold bangla-text leading-snug">হ্যালো!</p>
-                <p id="mobileSub" class="text-gray-400 text-xs mt-2 pt-2 border-t border-gray-100">Hello!</p>
-            </div>
-            
-            <!-- Cat -->
-            <div id="cat-wrapper">
-                <div class="touch-zone touch-left" onclick="handlePet()"></div>
-                <div class="touch-zone touch-right" onclick="handleScold()"></div>
-                <div class="mouth-zone" onclick="stopSpeaking()"></div>
-                
-                <svg viewBox="0 0 200 220" class="w-full h-full">
-                    <ellipse cx="100" cy="210" rx="70" ry="12" fill="#000" opacity="0.1" />
-                    <path id="tail" d="M140 170 Q160 140 150 110 Q140 80 155 60" stroke="#4f46e5" stroke-width="14" fill="none" stroke-linecap="round" />
-                    <ellipse cx="100" cy="170" rx="55" ry="45" fill="#6366f1" />
-                    <path d="M60 200 Q100 160 140 200" fill="#4f46e5" />
-                    <ellipse cx="70" cy="205" rx="15" ry="10" fill="#e0e7ff" />
-                    <ellipse cx="130" cy="205" rx="15" ry="10" fill="#e0e7ff" />
-                    
-                    <g id="head-group" style="transform-origin: 100px 100px;">
-                        <path d="M45 50 L25 10 L70 35 Z" fill="#4338ca" />
-                        <path d="M155 50 L175 10 L130 35 Z" fill="#4338ca" />
-                        <circle cx="100" cy="105" r="80" fill="#6366f1" />
-                        <ellipse cx="100" cy="118" rx="62" ry="52" fill="#e0e7ff" />
-                        
-                        <g id="eyes">
-                            <ellipse class="eye-lid" cx="72" cy="110" rx="11" ry="11" fill="#1e293b" />
-                            <ellipse class="eye-lid" cx="128" cy="110" rx="11" ry="11" fill="#1e293b" />
-                            <circle cx="75" cy="107" r="4" fill="white" opacity="0.8" />
-                            <circle cx="131" cy="107" r="4" fill="white" opacity="0.8" />
-                        </g>
-                        
-                        <path d="M92 135 L108 135 L100 145 Z" fill="#f472b6" />
-                        <path id="mouth" d="M85 150 Q100 160 115 150" stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round" />
-                        
-                        <g stroke="#1e293b" stroke-width="1.5" opacity="0.4">
-                            <line x1="30" y1="120" x2="65" y2="125" />
-                            <line x1="28" y1="135" x2="65" y2="135" />
-                            <line x1="30" y1="150" x2="65" y2="145" />
-                            <line x1="170" y1="120" x2="135" y2="125" />
-                            <line x1="172" y1="135" x2="135" y2="135" />
-                            <line x1="170" y1="150" x2="135" y2="145" />
-                        </g>
-                    </g>
-                </svg>
-            </div>
-        </div>
-        
-        <!-- Controls -->
-        <div class="mobile-controls">
-            <div class="flex justify-center items-center gap-8">
-                <button onclick="triggerDance()" class="w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center text-2xl active:scale-90 transition-transform">
-                    💃
-                </button>
-                
-                <button id="mobileMic" onclick="toggleMic()" class="mic-btn text-gray-400">
-                    <i class="fas fa-microphone"></i>
-                </button>
-                
-                <button onclick="manualEmotion('love')" class="w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center text-2xl active:scale-90 transition-transform">
-                    ❤️
-                </button>
-            </div>
-            
-            <div class="flex justify-center mt-4">
-                <div class="status-bar">
-                    <div class="status-dot" id="mobileStatusDot"></div>
-                    <span id="mobileStatusText">Tap mic to start</span>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- ==================== PC VIEW ==================== -->
-    <div class="pc-view" id="pcView">
-        <!-- Left Sidebar -->
-        <div class="pc-sidebar">
-            <div class="mb-8">
-                <h1 class="text-3xl font-black text-indigo-600 mb-2">AI Cat</h1>
-                <p class="text-gray-500">Your smart companion</p>
-            </div>
-            
-            <div class="space-y-4 flex-1">
-                <div class="p-4 bg-indigo-50 rounded-xl">
-                    <h3 class="font-bold text-indigo-900 mb-3">Quick Actions</h3>
-                    <div class="space-y-2">
-                        <button onclick="triggerDance()" class="w-full p-3 bg-white rounded-lg text-left hover:bg-indigo-100 transition-colors flex items-center gap-3">
-                            <span class="text-2xl">💃</span>
-                            <div>
-                                <div class="font-semibold">Dance</div>
-                                <div class="text-xs text-gray-500">Make the cat dance</div>
-                            </div>
-                        </button>
-                        <button onclick="manualEmotion('love')" class="w-full p-3 bg-white rounded-lg text-left hover:bg-pink-100 transition-colors flex items-center gap-3">
-                            <span class="text-2xl">❤️</span>
-                            <div>
-                                <div class="font-semibold">Show Love</div>
-                                <div class="text-xs text-gray-500">Pet the cat</div>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="p-4 bg-gray-50 rounded-xl">
-                    <h3 class="font-bold text-gray-900 mb-3">Voice Commands</h3>
-                    <ul class="text-sm text-gray-600 space-y-2">
-                        <li>💃 <strong>"Dance"</strong> - Cat dances</li>
-                        <li>🔍 <strong>"Search for..."</strong> - Google search</li>
-                        <li>❤️ <strong>"I love you"</strong> - Happy mode</li>
-                        <li>😾 <strong>"Bad cat"</strong> - Sad mode</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <button onclick="openSettings()" class="w-full p-4 bg-gray-100 rounded-xl text-left flex items-center gap-3 hover:bg-gray-200 transition-colors mt-4">
-                <i class="fas fa-cog text-xl text-gray-600"></i>
-                <div>
-                    <div class="font-semibold">Settings</div>
-                    <div class="text-xs text-gray-500">Customize AI & Voice</div>
-                </div>
-            </button>
-        </div>
-        
-        <!-- Main Area -->
-        <div class="pc-main">
-            <!-- Header -->
-            <div class="pc-header">
-                <div class="status-bar">
-                    <div class="status-dot" id="pcStatusDot"></div>
-                    <span id="pcStatusText">Ready</span>
-                </div>
-                
-                <div class="flex items-center gap-4">
-                    <span class="text-sm text-gray-500">Auto-Listen: <span class="text-emerald-500 font-bold">ON</span></span>
-                </div>
-            </div>
-            
+        <!-- Main Content -->
+        <div class="main-content">
             <!-- Cat Stage -->
-            <div class="pc-cat-stage">
+            <div class="cat-stage">
                 <!-- Speech Bubble -->
-                <div class="speech-bubble" id="pcBubble">
-                    <div class="flex items-center gap-2 mb-2">
-                        <div class="w-2 h-2 bg-gray-300 rounded-full cursor-move" id="pcDrag"></div>
-                        <div class="flex-1 h-0.5 bg-gray-100"></div>
-                    </div>
-                    <p id="pcUserText" class="text-indigo-500 text-sm font-bold mb-1 opacity-60"></p>
-                    <p id="pcCaption" class="text-gray-800 text-xl font-bold bangla-text leading-relaxed">হ্যালো! আমি তোমার বুদ্ধিমান বিড়াল।</p>
-                    <p id="pcSub" class="text-gray-400 text-sm mt-2 pt-2 border-t border-gray-100">Hello! I'm your smart AI cat.</p>
+                <div class="speech-bubble" id="speechBubble">
+                    <div class="drag-handle" id="dragHandle"></div>
+                    <div class="user-text" id="userText"></div>
+                    <div class="caption" id="caption">হ্যালো! আমি তোমার বুদ্ধিমান বিড়াল।</div>
+                    <div class="subtitle" id="subtitle">Hello! I'm your smart AI cat.</div>
                 </div>
-                
+
                 <!-- Cat -->
                 <div id="cat-wrapper">
                     <div class="touch-zone touch-left" onclick="handlePet()"></div>
                     <div class="touch-zone touch-right" onclick="handleScold()"></div>
-                    <div class="mouth-zone" onclick="stopSpeaking()"></div>
-                    
+                    <div class="mouth-zone" onclick="stopSpeaking()" title="Tap to stop speaking"></div>
+
                     <svg viewBox="0 0 200 220" class="w-full h-full">
                         <ellipse cx="100" cy="210" rx="70" ry="12" fill="#000" opacity="0.1" />
-                        <path id="tail" d="M140 170 Q160 140 150 110 Q140 80 155 60" stroke="#4f46e5" stroke-width="16" fill="none" stroke-linecap="round" />
-                        <ellipse cx="100" cy="170" rx="60" ry="50" fill="#6366f1" />
-                        <path d="M55 205 Q100 155 145 205" fill="#4f46e5" />
-                        <ellipse cx="75" cy="210" rx="18" ry="12" fill="#e0e7ff" />
-                        <ellipse cx="125" cy="210" rx="18" ry="12" fill="#e0e7ff" />
+                        <path id="tail" d="M140 170 Q160 140 150 110 Q140 80 155 60" stroke="#4f46e5" stroke-width="14" fill="none" stroke-linecap="round" />
+                        <ellipse cx="100" cy="170" rx="55" ry="45" fill="#6366f1" />
+                        <path d="M60 200 Q100 160 140 200" fill="#4f46e5" />
+                        <ellipse cx="70" cy="205" rx="15" ry="10" fill="#e0e7ff" />
+                        <ellipse cx="130" cy="205" rx="15" ry="10" fill="#e0e7ff" />
                         
                         <g id="head-group" style="transform-origin: 100px 100px;">
-                            <path d="M45 50 L20 5 L70 35 Z" fill="#4338ca" />
-                            <path d="M155 50 L180 5 L130 35 Z" fill="#4338ca" />
-                            <circle cx="100" cy="105" r="85" fill="#6366f1" />
-                            <ellipse cx="100" cy="120" rx="65" ry="55" fill="#e0e7ff" />
+                            <path d="M45 50 L25 10 L70 35 Z" fill="#4338ca" />
+                            <path d="M155 50 L175 10 L130 35 Z" fill="#4338ca" />
+                            <circle cx="100" cy="105" r="80" fill="#6366f1" />
+                            <ellipse cx="100" cy="118" rx="62" ry="52" fill="#e0e7ff" />
                             
                             <g id="eyes">
-                                <ellipse class="eye-lid" cx="70" cy="115" rx="12" ry="12" fill="#1e293b" />
-                                <ellipse class="eye-lid" cx="130" cy="115" rx="12" ry="12" fill="#1e293b" />
-                                <circle cx="73" cy="112" r="5" fill="white" opacity="0.9" />
-                                <circle cx="133" cy="112" r="5" fill="white" opacity="0.9" />
+                                <ellipse class="eye-lid" cx="72" cy="110" rx="11" ry="11" fill="#1e293b" />
+                                <ellipse class="eye-lid" cx="128" cy="110" rx="11" ry="11" fill="#1e293b" />
+                                <circle cx="75" cy="107" r="4" fill="white" opacity="0.8" />
+                                <circle cx="131" cy="107" r="4" fill="white" opacity="0.8" />
                             </g>
                             
-                            <path d="M90 140 L110 140 L100 152 Z" fill="#f472b6" />
-                            <path id="mouth" d="M82 158 Q100 170 118 158" stroke="#1e293b" stroke-width="3.5" fill="none" stroke-linecap="round" />
+                            <path d="M92 135 L108 135 L100 145 Z" fill="#f472b6" />
+                            <path id="mouth" d="M85 150 Q100 160 115 150" stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round" />
                             
-                            <g stroke="#1e293b" stroke-width="2" opacity="0.4">
-                                <line x1="25" y1="125" x2="65" y2="130" />
-                                <line x1="22" y1="142" x2="65" y2="142" />
-                                <line x1="25" y1="158" x2="65" y2="152" />
-                                <line x1="175" y1="125" x2="135" y2="130" />
-                                <line x1="178" y1="142" x2="135" y2="142" />
-                                <line x1="175" y1="158" x2="135" y2="152" />
+                            <g stroke="#1e293b" stroke-width="1.5" opacity="0.4">
+                                <line x1="30" y1="120" x2="65" y2="125" />
+                                <line x1="28" y1="135" x2="65" y2="135" />
+                                <line x1="30" y1="150" x2="65" y2="145" />
+                                <line x1="170" y1="120" x2="135" y2="125" />
+                                <line x1="172" y1="135" x2="135" y2="135" />
+                                <line x1="170" y1="150" x2="135" y2="145" />
                             </g>
                         </g>
                     </svg>
                 </div>
             </div>
-            
-            <!-- PC Input Area -->
-            <div class="pc-input-area">
-                <button onclick="toggleMic()" id="pcMicBtn" class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 transition-colors">
-                    <i class="fas fa-microphone"></i>
-                </button>
-                <input type="text" id="pcInput" class="flex-1 border-none outline-none px-4 text-base" placeholder="Type your message or click mic to speak..." onkeydown="if(event.key==='Enter') sendPcText()">
-                <button onclick="sendPcText()" class="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center hover:bg-indigo-700 transition-colors">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
+
+            <!-- Controls -->
+            <div class="controls-area">
+                <div class="control-buttons">
+                    <button onclick="triggerDance()" class="control-btn" title="Dance">💃</button>
+                    
+                    <button onclick="toggleMic()" id="mainMic" class="control-btn mic-btn text-gray-400">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    
+                    <button onclick="manualEmotion('love')" class="control-btn" title="Love">❤️</button>
+                </div>
+                
+                <div class="status-bar">
+                    <div class="status-dot" id="mainStatusDot"></div>
+                    <span id="mainStatusText">Tap mic to start</span>
+                </div>
             </div>
         </div>
     </div>
@@ -835,79 +1034,108 @@
             speechRate: 1,
             speechPitch: 1.2,
             targetLang: 'bn',
-            isMobile: window.innerWidth < 1024,
+            deviceMode: 'mobile', // 'mobile' or 'pc'
             config: {
                 key: localStorage.getItem('cat_key') || '',
-                model: localStorage.getItem('cat_model') || 'google/gemini-2.0-flash-exp:free'
+                model: localStorage.getItem('cat_model') || 'google/gemini-2.0-flash-exp:free',
+                customModel: localStorage.getItem('cat_custom_model') || ''
             }
         };
 
-        // ==================== DEVICE DETECTION ====================
-        window.addEventListener('resize', () => {
-            STATE.isMobile = window.innerWidth < 1024;
-        });
-
-        function getElements() {
-            if (STATE.isMobile) {
-                return {
-                    userText: document.getElementById('mobileUserText'),
-                    caption: document.getElementById('mobileCaption'),
-                    sub: document.getElementById('mobileSub'),
-                    mic: document.getElementById('mobileMic'),
-                    statusDot: document.getElementById('mobileStatusDot'),
-                    statusText: document.getElementById('mobileStatusText'),
-                    input: document.getElementById('mobileInput')
-                };
-            } else {
-                return {
-                    userText: document.getElementById('pcUserText'),
-                    caption: document.getElementById('pcCaption'),
-                    sub: document.getElementById('pcSub'),
-                    mic: document.getElementById('pcMicBtn'),
-                    statusDot: document.getElementById('pcStatusDot'),
-                    statusText: document.getElementById('pcStatusText'),
-                    input: document.getElementById('pcInput')
-                };
-            }
-        }
+        // Language names mapping
+        const LANG_NAMES = {
+            bn: 'Bengali', hi: 'Hindi', ur: 'Urdu', ta: 'Tamil', te: 'Telugu',
+            es: 'Spanish', fr: 'French', de: 'German', ja: 'Japanese',
+            ko: 'Korean', zh: 'Chinese', ar: 'Arabic', ru: 'Russian'
+        };
 
         // ==================== VOICE SETUP ====================
         let voices = [];
+        
         function loadVoices() {
             voices = window.speechSynthesis.getVoices();
             const voiceList = document.getElementById('voiceList');
             voiceList.innerHTML = '';
             
-            const goodVoices = voices.filter(v => v.lang.startsWith('en'));
+            // Filter for English voices primarily
+            const goodVoices = voices.filter(v => v.lang.startsWith('en') || v.lang.startsWith('en-US') || v.lang.startsWith('en-GB'));
             
-            goodVoices.forEach((voice, index) => {
+            if (goodVoices.length === 0) {
+                voiceList.innerHTML = '<div class="text-sm text-gray-500 p-4 text-center">No voices found. Using default.</div>';
+                return;
+            }
+            
+            goodVoices.forEach((voice) => {
                 const div = document.createElement('div');
                 div.className = 'voice-option';
-                if (voice.name.includes('Google US English') || voice.name.includes('Samantha')) {
+                
+                // Auto-select Google US English or Samantha or first available
+                const isDefault = voice.name.includes('Google US English') || 
+                                  voice.name.includes('Samantha') || 
+                                  voice.name.includes('Microsoft Zira') ||
+                                  (!STATE.selectedVoice && goodVoices.indexOf(voice) === 0);
+                
+                if (isDefault && !STATE.selectedVoice) {
                     div.classList.add('selected');
                     STATE.selectedVoice = voice;
                 }
+                
                 div.innerHTML = `
                     <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
                         <i class="fas fa-volume-up"></i>
                     </div>
-                    <div class="flex-1">
-                        <div class="font-semibold text-sm">${voice.name}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-semibold text-sm truncate">${voice.name}</div>
                         <div class="text-xs text-gray-500">${voice.lang}</div>
                     </div>
                 `;
+                
                 div.onclick = () => {
                     document.querySelectorAll('.voice-option').forEach(v => v.classList.remove('selected'));
                     div.classList.add('selected');
                     STATE.selectedVoice = voice;
+                    // Test voice
+                    const test = new SpeechSynthesisUtterance("Hello, this is my voice");
+                    test.voice = voice;
+                    test.rate = STATE.speechRate;
+                    test.pitch = STATE.speechPitch;
+                    window.speechSynthesis.speak(test);
                 };
+                
                 voiceList.appendChild(div);
             });
         }
 
         if (window.speechSynthesis) {
             window.speechSynthesis.onvoiceschanged = loadVoices;
+            // Try loading immediately and after delay for mobile
+            loadVoices();
             setTimeout(loadVoices, 1000);
+            setTimeout(loadVoices, 3000);
+        }
+
+        // ==================== DEVICE SWITCH ====================
+        function switchDevice(mode) {
+            STATE.deviceMode = mode;
+            document.getElementById('mobileSwitch').classList.toggle('active', mode === 'mobile');
+            document.getElementById('pcSwitch').classList.toggle('active', mode === 'pc');
+            
+            if (mode === 'pc') {
+                document.body.classList.add('pc-mode');
+            } else {
+                document.body.classList.remove('pc-mode');
+            }
+            
+            // Save preference
+            localStorage.setItem('cat_device_mode', mode);
+        }
+
+        // Load saved device mode
+        const savedDevice = localStorage.getItem('cat_device_mode');
+        if (savedDevice) {
+            switchDevice(savedDevice);
+        } else if (window.innerWidth >= 1024) {
+            switchDevice('pc');
         }
 
         // ==================== DANCE ====================
@@ -915,23 +1143,23 @@
             if (STATE.dancing) return;
             STATE.dancing = true;
             
-            const wrapper = document.querySelector('#cat-wrapper');
+            const wrapper = document.getElementById('cat-wrapper');
             wrapper.classList.add('dancing');
             
-            // Music notes
+            // Create music notes
             for (let i = 0; i < 8; i++) {
                 setTimeout(() => {
                     const note = document.createElement('div');
                     note.className = 'music-note';
-                    note.innerText = ['🎵', '🎶', '💃', '🕺', '✨'][Math.floor(Math.random() * 5)];
+                    note.innerText = ['🎵', '🎶', '💃', '🕺', '✨', '🎼'][Math.floor(Math.random() * 6)];
                     note.style.left = (20 + Math.random() * 200) + 'px';
                     note.style.top = '50px';
                     wrapper.appendChild(note);
                     setTimeout(() => note.remove(), 2000);
-                }, i * 250);
+                }, i * 200);
             }
             
-            speak("I'm dancing! Watch me move!", "আমি নাচছি! দেখো!", false);
+            speak("I'm dancing! Look at me go!", "আমি নাচছি! দেখো!", false);
             
             setTimeout(() => {
                 wrapper.classList.remove('dancing');
@@ -940,19 +1168,19 @@
             }, 6000);
         }
 
-        // ==================== EMOTIONS & TOUCH ====================
+        // ==================== EMOTIONS ====================
         function handlePet() {
             if (STATE.dancing) return;
             setEmotion('love');
             createHearts();
-            speak("Purr... I love you!", "গুরুগুরু... তোমাকে ভালোবাসি!");
+            speak("Purr... I love you so much!", "গুরুগুরু... আমি তোমাকে অনেক ভালোবাসি!");
         }
 
         function handleScold() {
             if (STATE.dancing) return;
             setEmotion('sad');
             createTears();
-            speak("Meow... why scold me?", "মিউ... কেন বকছো?");
+            speak("Meow... why are you scolding me?", "মিউ... কেন আমাকে বকছো?");
         }
 
         function manualEmotion(emo) {
@@ -960,12 +1188,12 @@
             setEmotion(emo);
             if (emo === 'love') {
                 createHearts();
-                speak("Purr purr!", "গুরুগুরু!");
+                speak("Purr purr! So happy!", "গুরুগুরু! খুব খুশি!");
             }
         }
 
         function setEmotion(emotion) {
-            const wrapper = document.querySelector('#cat-wrapper');
+            const wrapper = document.getElementById('cat-wrapper');
             wrapper.classList.remove('emotion-happy', 'emotion-sad', 'emotion-angry', 'emotion-love', 'dancing');
             STATE.emotion = emotion;
             if (emotion !== 'neutral') {
@@ -974,29 +1202,29 @@
         }
 
         function createHearts() {
-            const wrapper = document.querySelector('#cat-wrapper');
+            const wrapper = document.getElementById('cat-wrapper');
             for (let i = 0; i < 6; i++) {
                 setTimeout(() => {
                     const heart = document.createElement('div');
                     heart.className = 'heart-particle';
-                    heart.innerText = '💖';
+                    heart.innerText = ['💖', '💕', '💗', '💝', '💞'][Math.floor(Math.random() * 5)];
                     heart.style.left = (40 + Math.random() * 180) + 'px';
                     heart.style.top = '80px';
                     wrapper.appendChild(heart);
                     setTimeout(() => heart.remove(), 1500);
-                }, i * 100);
+                }, i * 120);
             }
         }
 
         function createTears() {
-            const eyes = document.querySelector('#eyes');
+            const eyes = document.getElementById('eyes');
             for (let i = 0; i < 3; i++) {
                 setTimeout(() => {
                     const tear = document.createElement('div');
-                    tear.style.cssText = 'position:absolute;width:12px;height:16px;background:#60a5fa;border-radius:50%;left:' + (i % 2 === 0 ? 60 : 140) + 'px;top:120px;animation:fall 1s linear forwards;z-index:50;';
+                    tear.style.cssText = 'position:absolute;width:12px;height:16px;background:#60a5fa;border-radius:50%;left:' + (i % 2 === 0 ? 60 : 140) + 'px;top:120px;animation:fall 1.2s linear forwards;z-index:50;';
                     eyes.appendChild(tear);
-                    setTimeout(() => tear.remove(), 1000);
-                }, i * 200);
+                    setTimeout(() => tear.remove(), 1200);
+                }, i * 250);
             }
         }
 
@@ -1007,15 +1235,15 @@
             }
         }
 
-        // ==================== AUTO-LISTEN SYSTEM ====================
+        // ==================== AUTO-LISTEN ====================
         function onSpeechEnd() {
             STATE.speaking = false;
             document.body.classList.remove('is-speaking');
-            document.querySelector('#mouth').setAttribute('d', STATE.isMobile ? 'M85 150 Q100 160 115 150' : 'M82 158 Q100 170 118 158');
+            document.getElementById('mouth').setAttribute('d', 'M85 150 Q100 160 115 150');
             updateStatus('ready');
             
             if (STATE.autoListen && !STATE.dancing) {
-                setTimeout(() => startListening(), 1000);
+                setTimeout(() => startListening(), 800);
             }
         }
 
@@ -1032,32 +1260,34 @@
             rec.onstart = () => {
                 STATE.listening = true;
                 document.body.classList.add('listening-active');
-                const els = getElements();
-                els.mic.classList.add('listening');
+                document.getElementById('mainMic').classList.add('listening');
                 updateStatus('listening');
             };
 
             rec.onresult = (e) => {
                 const text = e.results[0][0].transcript;
-                const els = getElements();
-                els.userText.innerText = `"${text}"`;
+                document.getElementById('userText').innerText = `"${text}"`;
                 processCommand(text);
             };
 
             rec.onend = () => {
                 STATE.listening = false;
                 document.body.classList.remove('listening-active');
-                const els = getElements();
-                els.mic.classList.remove('listening');
+                document.getElementById('mainMic').classList.remove('listening');
                 
                 if (STATE.autoListen && !STATE.speaking && !STATE.dancing) {
                     setTimeout(() => startListening(), 500);
+                } else {
+                    updateStatus('ready');
                 }
             };
 
-            rec.onerror = () => {
+            rec.onerror = (e) => {
+                console.log('Speech error:', e.error);
                 rec.stop();
-                if (STATE.autoListen) setTimeout(() => startListening(), 1000);
+                setTimeout(() => {
+                    if (STATE.autoListen) startListening();
+                }, 1000);
             };
         }
 
@@ -1066,6 +1296,7 @@
             try {
                 rec.start();
             } catch(e) {
+                console.log('Start error:', e);
                 setTimeout(startListening, 500);
             }
         }
@@ -1075,7 +1306,10 @@
         }
 
         function toggleMic() {
-            if (!rec) return alert("Speech recognition not supported!");
+            if (!rec) {
+                alert("Speech recognition not supported in this browser. Please use Chrome.");
+                return;
+            }
             
             if (STATE.listening) {
                 STATE.autoListen = !STATE.autoListen;
@@ -1087,54 +1321,217 @@
             }
         }
 
-        // ==================== COMMANDS ====================
+        // ==================== COMMAND PROCESSING ====================
         function processCommand(text) {
-            const lower = text.toLowerCase();
-            const els = getElements();
+            const lower = text.toLowerCase().trim();
+            
+            // Open commands
+            const openCommands = {
+                'google': 'https://www.google.com',
+                'facebook': 'https://www.facebook.com',
+                'youtube': 'https://www.youtube.com',
+                'instagram': 'https://www.instagram.com',
+                'chatgpt': 'https://chat.openai.com',
+                'gpt': 'https://chat.openai.com',
+                'gemini': 'https://gemini.google.com',
+                'kimi': 'https://www.kimi.com',
+                'claude': 'https://claude.ai',
+                'wikipedia': 'https://www.wikipedia.org',
+                'wiki': 'https://www.wikipedia.org',
+                'whisk': 'https://whisk.google.com',
+                'opal': 'https://opal.com',
+                'ai': 'https://chat.openai.com'
+            };
 
-            if (lower.includes('dance') || lower.includes('নাচ')) {
-                triggerDance();
+            // Check for "open X" commands
+            for (const [key, url] of Object.entries(openCommands)) {
+                if (lower.includes(`open ${key}`) || lower === key) {
+                    showQuickLinks();
+                    speak(`Opening ${key}`, `${key} খোলা হচ্ছে`);
+                    return;
+                }
+            }
+
+            // Check for "my folder" or similar
+            if (lower.includes('my folder') || lower.includes('folder')) {
+                speak("I don't have access to your local folders yet. Please open your file manager.", "আমার এখনো আপনার ফোল্ডারে অ্যাক্সেস নেই। দয়া করে ফাইল ম্যানেজার খুলুন।");
                 return;
             }
 
+            // Search command with info popup
             if (lower.includes('search for') || lower.includes('search')) {
                 const query = text.replace(/search for|search/i, '').trim();
                 if (query) {
-                    window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
-                    speak(`Searching Google for ${query}`, `গুগলে ${query} খোঁজা হচ্ছে`);
+                    performSearch(query);
+                } else {
+                    speak("What would you like me to search for?", "আমি কী খোঁজব?");
                 }
                 return;
             }
 
-            if (lower.includes('open setting') || lower.includes('setting')) {
-                openSettings();
+            // Close commands
+            if (lower.includes('close google') || lower.includes('close search') || lower.includes('close popup')) {
+                closeInfoPopup();
+                closeQuickLinks();
+                speak("Closed", "বন্ধ করা হয়েছে");
                 return;
             }
 
-            if (lower.includes('love') || lower.includes('like')) setEmotion('love');
-            else if (lower.includes('bad') || lower.includes('angry')) setEmotion('angry');
-            else if (lower.includes('sad')) setEmotion('sad');
+            // Emotions
+            if (lower.includes('dance') || lower.includes('নাচ')) {
+                triggerDance();
+                return;
+            }
+            if (lower.includes('love') || lower.includes('like') || lower.includes('ভালো')) {
+                setEmotion('love');
+                createHearts();
+            } else if (lower.includes('bad') || lower.includes('angry') || lower.includes('খারাপ')) {
+                setEmotion('angry');
+            } else if (lower.includes('sad') || lower.includes('cry') || lower.includes('কাঁদ')) {
+                setEmotion('sad');
+                createTears();
+            } else if (lower.includes('happy') || lower.includes('smile') || lower.includes('হাস')) {
+                setEmotion('happy');
+            }
 
             callAI(text);
+        }
+
+        // ==================== SEARCH WITH INFO POPUP ====================
+        async function performSearch(query) {
+            document.getElementById('searchQueryDisplay').innerText = query;
+            document.getElementById('infoContent').innerHTML = '<div class="loading-spinner"></div>';
+            document.getElementById('infoPopup').classList.add('active');
+            
+            speak(`Searching for ${query}. Please wait.`, `${query} খোঁজা হচ্ছে। অপেক্ষা করুন।`);
+            
+            try {
+                // Use OpenRouter to search and summarize
+                const searchPrompt = `Search for information about "${query}" and provide a comprehensive summary. 
+                Include: 1) Brief overview, 2) Key facts (3-4 points), 3) Interesting details.
+                Format: Use clear sections. Be informative but concise.`;
+                
+                const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${STATE.config.key}`,
+                        "Content-Type": "application/json",
+                        "HTTP-Referer": window.location.href,
+                        "X-Title": "AI Cat Search"
+                    },
+                    body: JSON.stringify({
+                        model: STATE.config.model,
+                        messages: [{ role: 'user', content: searchPrompt }]
+                    })
+                });
+                
+                const data = await res.json();
+                const result = data.choices[0].message.content;
+                
+                // Parse and format the result
+                const sections = result.split('\n').filter(s => s.trim());
+                let html = '';
+                
+                html += `<div class="info-card">
+                    <h3>🔍 Overview</h3>
+                    <p>${sections[0] || 'Information about ' + query}</p>
+                    <div class="source">Source: AI Search</div>
+                </div>`;
+                
+                let currentSection = '';
+                sections.slice(1).forEach(section => {
+                    if (section.includes(':') || section.startsWith('-') || section.startsWith('•')) {
+                        currentSection += `<p style="margin-bottom: 8px;">${section.replace(/^[-•]\s*/, '• ')}</p>`;
+                    }
+                });
+                
+                if (currentSection) {
+                    html += `<div class="info-card">
+                        <h3>📌 Key Information</h3>
+                        ${currentSection}
+                    </div>`;
+                }
+                
+                // Add Google link
+                html += `<div class="info-card" style="background: linear-gradient(135deg, #4285f4, #34a853); color: white;">
+                    <h3 style="color: white;">🌐 View on Google</h3>
+                    <p>Click below to see more results on Google</p>
+                    <button onclick="window.open('https://www.google.com/search?q=${encodeURIComponent(query)}', '_blank')" 
+                        style="margin-top: 12px; background: white; color: #4285f4; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer;">
+                        Open Google Search
+                    </button>
+                </div>`;
+                
+                document.getElementById('infoContent').innerHTML = html;
+                
+                // Speak summary
+                const summary = result.substring(0, 150) + '...';
+                speak(`Here's what I found about ${query}. ${summary}`, 
+                      `আমি ${query} সম্পর্কে এই তথ্য পেয়েছি। ${summary}`);
+                
+            } catch (error) {
+                // Fallback: Show Google search link
+                document.getElementById('infoContent').innerHTML = `
+                    <div class="info-card">
+                        <h3>🔍 Search: ${query}</h3>
+                        <p>Click below to search on Google:</p>
+                        <button onclick="window.open('https://www.google.com/search?q=${encodeURIComponent(query)}', '_blank')" 
+                            style="margin-top: 12px; background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 24px; font-weight: bold; cursor: pointer; width: 100%;">
+                            <i class="fab fa-google mr-2"></i> Search on Google
+                        </button>
+                    </div>
+                    <div class="info-card">
+                        <p class="text-gray-500 text-sm">Tip: Add your OpenRouter API key in settings for AI-powered search summaries.</p>
+                    </div>
+                `;
+                
+                speak(`I opened Google search for ${query}. Please check your browser.`, 
+                      `আমি ${query} এর জন্য গুগল খুলেছি। আপনার ব্রাউজার চেক করুন।`);
+            }
+        }
+
+        function closeInfoPopup() {
+            document.getElementById('infoPopup').classList.remove('active');
+            if (STATE.autoListen) setTimeout(() => startListening(), 500);
+        }
+
+        // ==================== QUICK LINKS ====================
+        function showQuickLinks() {
+            document.getElementById('quickLinksPopup').classList.add('active');
+            setTimeout(() => {
+                if (document.getElementById('quickLinksPopup').classList.contains('active')) {
+                    closeQuickLinks();
+                }
+            }, 5000); // Auto close after 5 seconds
+        }
+
+        function closeQuickLinks() {
+            document.getElementById('quickLinksPopup').classList.remove('active');
+        }
+
+        function openLink(url, name) {
+            window.open(url, '_blank');
+            closeQuickLinks();
+            speak(`Opening ${name}`, `${name} খোলা হচ্ছে`);
         }
 
         // ==================== AI API ====================
         async function callAI(text) {
             if (!STATE.config.key) {
-                speak("Please add API key in settings", "সেটিংসে API key যোগ করুন");
+                speak("Please add your OpenRouter API key in settings.", "সেটিংসে আপনার API key যোগ করুন।");
                 openSettings();
                 return;
             }
 
             updateStatus('thinking');
-
-            const langNames = { bn: 'Bengali', hi: 'Hindi', es: 'Spanish', fr: 'French', ja: 'Japanese' };
-            const targetLang = langNames[STATE.targetLang] || 'Bengali';
-
-            const prompt = `You are a cute robot cat that can dance and show emotions. 
+            
+            const targetLang = LANG_NAMES[STATE.targetLang] || 'Bengali';
+            
+            const prompt = `You are a cute, emotional robot cat companion. 
             Current emotion: ${STATE.emotion}.
-            Reply in English (max 12 words), then add ${targetLang} translation starting with "BN:".
-            User said: "${text}"`;
+            Reply in English (max 15 words), then add ${targetLang} translation starting with "TL:".
+            Be friendly and expressive!
+            User: "${text}"`;
 
             try {
                 const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -1153,117 +1550,140 @@
 
                 const data = await res.json();
                 const reply = data.choices[0].message.content;
-
-                const lines = reply.split('\n');
+                
+                const lines = reply.split('\n').filter(l => l.trim());
                 let english = lines[0].replace(/^EN:\s*/i, '').trim();
-                let translated = lines.find(l => l.toUpperCase().includes('BN:'))?.replace(/^BN:\s*/i, '').trim() || lines[1]?.trim() || "...";
-
-                const els = getElements();
-                els.caption.innerText = translated;
+                let translated = lines.find(l => l.toUpperCase().includes('TL:'))?.replace(/^TL:\s*/i, '').trim() || 
+                                lines.find(l => l.toUpperCase().includes('BN:'))?.replace(/^BN:\s*/i, '').trim() ||
+                                lines[1]?.trim() || "...";
+                
+                document.getElementById('caption').innerText = translated;
                 if (STATE.showSubtitles) {
-                    els.sub.style.display = 'block';
-                    els.sub.innerText = english;
+                    document.getElementById('subtitle').style.display = 'block';
+                    document.getElementById('subtitle').innerText = english;
                 } else {
-                    els.sub.style.display = 'none';
+                    document.getElementById('subtitle').style.display = 'none';
                 }
-
+                
                 speak(english, translated);
-
+                
             } catch (e) {
-                speak("Meow! Something went wrong!", "মিউ! সমস্যা হয়েছে!");
+                console.error(e);
+                speak("Meow! I had a little error. Try again!", "মিউ! একটু সমস্যা হয়েছে। আবার চেষ্টা করো!");
             }
         }
 
         function speak(english, translated, autoListen = true) {
             STATE.speaking = true;
             window.speechSynthesis.cancel();
-
+            
             const ut = new SpeechSynthesisUtterance(english);
             ut.lang = 'en-US';
             ut.rate = STATE.speechRate;
             ut.pitch = STATE.speechPitch;
             
+            // Force voice selection
             if (STATE.selectedVoice) {
                 ut.voice = STATE.selectedVoice;
+            } else {
+                // Try to get any English voice
+                const voices = window.speechSynthesis.getVoices();
+                const enVoice = voices.find(v => v.lang.startsWith('en'));
+                if (enVoice) ut.voice = enVoice;
             }
-
-            const mouth = document.querySelector('#mouth');
+            
+            const mouth = document.getElementById('mouth');
             let mouthInterval;
-
+            
             ut.onstart = () => {
                 document.body.classList.add('is-speaking');
                 updateStatus('speaking');
                 
                 mouthInterval = setInterval(() => {
                     const open = Math.random() > 0.3;
-                    if (STATE.isMobile) {
-                        mouth.setAttribute('d', open ? 'M85 150 Q100 175 115 150' : 'M85 150 Q100 160 115 150');
-                    } else {
-                        mouth.setAttribute('d', open ? 'M82 158 Q100 185 118 158' : 'M82 158 Q100 170 118 158');
-                    }
+                    mouth.setAttribute('d', open ? 'M85 150 Q100 175 115 150' : 'M85 150 Q100 160 115 150');
                 }, 100);
             };
-
+            
             ut.onend = () => {
                 clearInterval(mouthInterval);
                 if (autoListen) onSpeechEnd();
             };
-
+            
+            // Mobile compatibility: some devices need resume
+            if (window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+            }
+            
             window.speechSynthesis.speak(ut);
+            
+            // Mobile fix: some browsers need this
+            setTimeout(() => {
+                if (window.speechSynthesis.speaking === false && STATE.speaking) {
+                    window.speechSynthesis.speak(ut);
+                }
+            }, 100);
         }
 
         // ==================== UI HELPERS ====================
         function updateStatus(status) {
-            const els = getElements();
-            els.statusDot.className = 'status-dot';
+            const dot = document.getElementById('mainStatusDot');
+            const text = document.getElementById('mainStatusText');
+            
+            dot.className = 'status-dot';
             
             switch(status) {
                 case 'listening':
-                    els.statusDot.classList.add('active');
-                    els.statusText.innerText = 'Listening...';
+                    dot.classList.add('active');
+                    text.innerText = 'Listening...';
                     break;
                 case 'speaking':
-                    els.statusDot.classList.add('speaking');
-                    els.statusText.innerText = 'Speaking...';
+                    dot.classList.add('speaking');
+                    text.innerText = 'Speaking...';
                     break;
                 case 'thinking':
-                    els.statusText.innerText = 'Thinking...';
+                    text.innerText = 'Thinking...';
                     break;
                 case 'manual':
-                    els.statusText.innerText = 'Manual Mode (Tap mic)';
+                    text.innerText = 'Tap mic to start';
                     break;
                 default:
-                    els.statusDot.classList.add('active');
-                    els.statusText.innerText = STATE.autoListen ? 'Auto-Listen ON' : 'Ready (Tap mic)';
+                    dot.classList.add('active');
+                    text.innerText = STATE.autoListen ? 'Auto-listening ON' : 'Ready (Tap mic)';
             }
         }
 
-        function sendMobileText() {
-            const input = document.getElementById('mobileInput');
+        function sendText() {
+            const input = document.getElementById('mainInput');
             const text = input.value.trim();
             if (!text) return;
-            document.getElementById('mobileUserText').innerText = `"${text}"`;
+            
+            document.getElementById('userText').innerText = `"${text}"`;
             processCommand(text);
             input.value = '';
-        }
-
-        function sendPcText() {
-            const input = document.getElementById('pcInput');
-            const text = input.value.trim();
-            if (!text) return;
-            document.getElementById('pcUserText').innerText = `"${text}"`;
-            processCommand(text);
-            input.value = '';
+            input.blur();
         }
 
         // ==================== SETTINGS ====================
-        function openSettings() {
-            document.getElementById('settingsOverlay').classList.add('active');
-            stopListening();
+        function handleModelChange() {
+            const select = document.getElementById('modelSelect');
+            const customInput = document.getElementById('customModel');
             
-            // Load current values
+            if (select.value === 'custom') {
+                customInput.classList.add('show');
+            } else {
+                customInput.classList.remove('show');
+            }
+        }
+
+        function openSettings() {
+            stopListening();
+            document.getElementById('settingsOverlay').classList.add('active');
+            
+            // Load values
             document.getElementById('apiKey').value = STATE.config.key;
             document.getElementById('modelSelect').value = STATE.config.model;
+            document.getElementById('customModel').value = STATE.config.customModel;
             document.getElementById('speechRate').value = STATE.speechRate;
             document.getElementById('rateValue').innerText = STATE.speechRate;
             document.getElementById('speechPitch').value = STATE.speechPitch;
@@ -1271,31 +1691,40 @@
             document.getElementById('autoListenToggle').checked = STATE.autoListen;
             document.getElementById('subtitleToggle').checked = STATE.showSubtitles;
             document.getElementById('langSelect').value = STATE.targetLang;
+            
+            handleModelChange();
+            
+            // Refresh voices
+            loadVoices();
         }
 
         function closeSettings(e) {
             if (e && e.target !== document.getElementById('settingsOverlay')) return;
             document.getElementById('settingsOverlay').classList.remove('active');
-            if (STATE.autoListen) startListening();
+            if (STATE.autoListen) setTimeout(() => startListening(), 500);
         }
 
         function saveSettings() {
+            const modelSelect = document.getElementById('modelSelect');
+            
             STATE.config.key = document.getElementById('apiKey').value;
-            STATE.config.model = document.getElementById('modelSelect').value;
+            STATE.config.model = modelSelect.value === 'custom' ? document.getElementById('customModel').value : modelSelect.value;
+            STATE.config.customModel = document.getElementById('customModel').value;
             STATE.speechRate = parseFloat(document.getElementById('speechRate').value);
             STATE.speechPitch = parseFloat(document.getElementById('speechPitch').value);
             STATE.autoListen = document.getElementById('autoListenToggle').checked;
             STATE.showSubtitles = document.getElementById('subtitleToggle').checked;
             STATE.targetLang = document.getElementById('langSelect').value;
-
+            
             localStorage.setItem('cat_key', STATE.config.key);
             localStorage.setItem('cat_model', STATE.config.model);
-
+            localStorage.setItem('cat_custom_model', STATE.config.customModel);
+            
             closeSettings();
-            speak("Settings saved!", "সেটিংস সংরক্ষিত হয়েছে!");
+            speak("Settings saved successfully!", "সেটিংস সফলভাবে সংরক্ষিত হয়েছে!");
         }
 
-        // Range input updates
+        // Range inputs
         document.getElementById('speechRate')?.addEventListener('input', (e) => {
             document.getElementById('rateValue').innerText = e.target.value;
         });
@@ -1303,24 +1732,76 @@
             document.getElementById('pitchValue').innerText = e.target.value;
         });
 
+        // ==================== DRAGGABLE BUBBLE ====================
+        let isDragging = false;
+        let startX, startY, initialX = 0, initialY = 0;
+        
+        const dragHandle = document.getElementById('dragHandle');
+        const bubble = document.getElementById('speechBubble');
+        
+        dragHandle.addEventListener('mousedown', startDrag);
+        dragHandle.addEventListener('touchstart', startDrag, {passive: false});
+        
+        function startDrag(e) {
+            isDragging = true;
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            startX = clientX - initialX;
+            startY = clientY - initialY;
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+            document.addEventListener('touchmove', drag, {passive: false});
+            document.addEventListener('touchend', stopDrag);
+        }
+        
+        function drag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            initialX = clientX - startX;
+            initialY = clientY - startY;
+            bubble.style.transform = `translate(${initialX}px, ${initialY}px)`;
+        }
+        
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('touchend', stopDrag);
+        }
+
         // ==================== INIT ====================
         window.onload = () => {
             // Load saved settings
             STATE.config.key = localStorage.getItem('cat_key') || '';
             STATE.config.model = localStorage.getItem('cat_model') || 'google/gemini-2.0-flash-exp:free';
-
-            // Start auto-listen
+            STATE.config.customModel = localStorage.getItem('cat_custom_model') || '';
+            
+            // Auto start
             setTimeout(() => {
                 if (STATE.autoListen) startListening();
-                speak("Hello! I'm your AI cat. Say dance to see me move!", "হ্যালো! আমি তোমার বিড়াল। নাচ বলো!");
-            }, 1000);
-
-            // Blink animation
+                speak("Hello! I'm your AI cat. Say 'open Google' or 'search for anything'!", 
+                      "হ্যালো! আমি তোমার AI বিড়াল। 'Google খোলো' বা 'খোঁজো' বলো!");
+            }, 1500);
+            
+            // Blink
             setInterval(() => {
-                document.querySelector('#eyes')?.classList.add('blink');
-                setTimeout(() => document.querySelector('#eyes')?.classList.remove('blink'), 150);
+                document.getElementById('eyes')?.classList.add('blink');
+                setTimeout(() => document.getElementById('eyes')?.classList.remove('blink'), 150);
             }, 4000);
         };
+
+        // Visibility change handler
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopListening();
+            } else if (STATE.autoListen) {
+                setTimeout(() => startListening(), 500);
+            }
+        });
     </script>
 </body>
 </html>
