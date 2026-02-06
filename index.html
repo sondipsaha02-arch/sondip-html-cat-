@@ -3,159 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Cat | Dance & Chat</title>
+    <title>AI Cat | Smart Companion</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&family=Inter:wght@400;600;800&display=swap');
         
-        * { -webkit-tap-highlight-color: transparent; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+        }
         
         body { 
             font-family: 'Inter', 'Noto Sans Bengali', sans-serif; 
             overflow: hidden; 
-            height: 100dvh; 
-            background: linear-gradient(180deg, #f0f9ff 0%, #e0e7ff 50%, #ddd6fe 100%);
-            touch-action: manipulation;
+            height: 100vh;
+            height: 100dvh;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
         }
         
-        /* Mobile-Optimized Layout */
-        .mobile-container {
-            height: 100dvh;
+        /* ========== DEVICE DETECTION ========== */
+        /* Mobile Version (default) */
+        .mobile-view {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        /* PC Version */
+        .pc-view {
+            display: none;
+            height: 100%;
+            width: 100%;
+        }
+        
+        @media (min-width: 1024px) {
+            .mobile-view { display: none !important; }
+            .pc-view { display: flex !important; }
+        }
+        
+        /* ========== MOBILE STYLES ========== */
+        .mobile-header {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 50;
+        }
+        
+        .mobile-input-bar {
+            flex: 1;
+            background: white;
+            border-radius: 25px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .mobile-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 16px;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        .mobile-send-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            margin-right: 4px;
+        }
+        
+        .mobile-cat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 20px;
+        }
+        
+        .mobile-controls {
+            padding: 20px;
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            background: linear-gradient(to top, rgba(255,255,255,0.95), transparent);
+        }
+        
+        /* ========== PC STYLES ========== */
+        .pc-sidebar {
+            width: 350px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        
+        .pc-main {
+            flex: 1;
             display: flex;
             flex-direction: column;
             position: relative;
         }
         
-        @media (min-width: 768px) {
-            .mobile-container {
-                max-width: 480px;
-                margin: 0 auto;
-                box-shadow: 0 0 60px rgba(0,0,0,0.1);
-            }
+        .pc-header {
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         
-        #sidebar { transition: transform 0.3s ease; z-index: 1000; }
-        #overlay { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.5); 
-            z-index: 900; 
-            backdrop-filter: blur(8px);
+        .pc-input-area {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            max-width: 90%;
+            background: white;
+            border-radius: 30px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            z-index: 100;
         }
         
-        /* Cat Container - Mobile Optimized */
-        #cat-stage {
-            position: relative;
+        .pc-cat-stage {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 0;
+            position: relative;
         }
         
+        /* ========== CAT ANIMATIONS ========== */
         #cat-wrapper {
             position: relative;
-            width: 280px;
-            height: 320px;
             transition: all 0.3s ease;
         }
         
-        @media (min-width: 768px) {
-            #cat-wrapper {
-                width: 320px;
-                height: 360px;
-            }
+        .mobile-view #cat-wrapper {
+            width: 260px;
+            height: 300px;
         }
         
-        /* === DANCE ANIMATIONS === */
+        .pc-view #cat-wrapper {
+            width: 380px;
+            height: 440px;
+        }
+        
+        /* Dance Animation */
         @keyframes dance-bounce {
-            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            25% { transform: translateY(-30px) rotate(-10deg) scale(1.05); }
-            50% { transform: translateY(0) rotate(0deg) scale(1); }
-            75% { transform: translateY(-30px) rotate(10deg) scale(1.05); }
-        }
-        
-        @keyframes dance-spin {
-            0% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(180deg) scale(1.1); }
-            100% { transform: rotate(360deg) scale(1); }
-        }
-        
-        @keyframes dance-shake {
-            0%, 100% { transform: translateX(0) rotate(0deg); }
-            20% { transform: translateX(-20px) rotate(-15deg); }
-            40% { transform: translateX(20px) rotate(15deg); }
-            60% { transform: translateX(-20px) rotate(-10deg); }
-            80% { transform: translateX(20px) rotate(10deg); }
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-40px) rotate(-15deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+            75% { transform: translateY(-40px) rotate(15deg); }
         }
         
         @keyframes tail-dance {
             0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(45deg); }
+            25% { transform: rotate(60deg); }
             50% { transform: rotate(0deg); }
-            75% { transform: rotate(-45deg); }
+            75% { transform: rotate(-60deg); }
         }
         
         .dancing {
-            animation: dance-bounce 0.6s infinite !important;
+            animation: dance-bounce 0.5s infinite !important;
         }
         
         .dancing #tail {
             animation: tail-dance 0.3s infinite !important;
         }
         
-        .dancing #head-group {
-            animation: dance-shake 0.5s infinite !important;
-        }
-        
-        /* Regular Emotions */
+        /* Emotions */
         .emotion-happy { animation: happy-bounce 1s infinite; }
         @keyframes happy-bounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+            50% { transform: translateY(-20px); }
         }
         
         .emotion-sad { 
-            transform: translateY(20px) scale(0.95); 
-            filter: brightness(0.8); 
-            transition: all 0.5s ease;
+            transform: translateY(30px) scale(0.9); 
+            filter: brightness(0.7); 
         }
         
         .emotion-angry { 
             animation: angry-shake 0.4s infinite; 
-            filter: hue-rotate(-30deg) brightness(0.9); 
+            filter: hue-rotate(-40deg); 
         }
         @keyframes angry-shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px) rotate(-3deg); }
-            75% { transform: translateX(8px) rotate(3deg); }
+            25% { transform: translateX(-10px) rotate(-5deg); }
+            75% { transform: translateX(10px) rotate(5deg); }
         }
         
         .emotion-love { 
-            animation: love-pulse 1s infinite; 
-            filter: hue-rotate(30deg); 
+            animation: love-pulse 0.8s infinite; 
         }
         @keyframes love-pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
+            50% { transform: scale(1.1); }
         }
         
-        /* Speaking Animation */
+        /* Speaking */
         .is-speaking #head-group {
             animation: speak-wobble 0.3s infinite alternate;
         }
         @keyframes speak-wobble {
-            from { transform: rotate(-4deg); }
-            to { transform: rotate(4deg); }
+            from { transform: rotate(-5deg); }
+            to { transform: rotate(5deg); }
         }
-        
-        /* Eyes */
-        .eye-lid { transform-origin: center; transition: transform 0.1s; }
-        .blink .eye-lid { transform: scaleY(0.1); }
-        .emotion-sad .eye-lid { transform: scaleY(0.6) translateY(3px); }
-        .emotion-angry .eye-lid { transform: scaleY(0.7) rotate(15deg); }
         
         /* Tail */
         #tail {
@@ -164,101 +238,88 @@
         }
         @keyframes tail-wag {
             0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(15deg); }
+            50% { transform: rotate(20deg); }
         }
         
-        .emotion-happy #tail, .emotion-love #tail {
-            animation: tail-wag-fast 0.4s infinite;
-        }
-        @keyframes tail-wag-fast {
-            0%, 100% { transform: rotate(-20deg); }
-            50% { transform: rotate(30deg); }
-        }
-        
-        /* Speech Bubble - Mobile Optimized */
-        #speech-bubble {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 340px;
-            z-index: 100;
-        }
-        
-        @media (max-width: 380px) {
-            #speech-bubble {
-                width: 95%;
-                top: 5px;
-            }
-        }
-        
-        /* Listening States */
+        /* Listening */
         .listening-active #cat-wrapper::before {
             content: '';
             position: absolute;
-            inset: -30px;
+            inset: -40px;
             border: 4px solid #10b981;
             border-radius: 50%;
-            animation: listening-pulse 1.5s infinite;
+            animation: listen-pulse 1.5s infinite;
             z-index: -1;
         }
         
-        @keyframes listening-pulse {
+        @keyframes listen-pulse {
             0% { transform: scale(0.8); opacity: 1; }
-            100% { transform: scale(1.4); opacity: 0; }
+            100% { transform: scale(1.5); opacity: 0; }
         }
         
-        .listening-active #cat-wrapper {
-            filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.5));
+        /* Speech Bubble */
+        .speech-bubble {
+            position: absolute;
+            background: white;
+            padding: 20px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            z-index: 100;
         }
         
-        /* Touch Zones - Large for Mobile */
+        .mobile-view .speech-bubble {
+            top: 10px;
+            left: 20px;
+            right: 20px;
+            max-width: none;
+        }
+        
+        .pc-view .speech-bubble {
+            top: 40px;
+            left: 40px;
+            width: 400px;
+        }
+        
+        /* Touch Zones */
         .touch-zone {
             position: absolute;
             top: 0;
             bottom: 0;
             width: 50%;
             z-index: 10;
+            cursor: pointer;
         }
         .touch-left { left: 0; }
         .touch-right { right: 0; }
         
         .mouth-zone {
             position: absolute;
-            width: 80px;
-            height: 60px;
+            width: 100px;
+            height: 80px;
             left: 50%;
             top: 55%;
             transform: translate(-50%, -50%);
             z-index: 15;
+            cursor: pointer;
             border-radius: 50%;
         }
         
-        /* Bottom Controls - Mobile Optimized */
-        .controls-area {
-            padding: 20px;
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
-            background: linear-gradient(to top, rgba(255,255,255,0.9), transparent);
-        }
-        
-        .mic-button {
-            width: 72px;
-            height: 72px;
+        /* Mic Button */
+        .mic-btn {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: white;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 32px;
+            transition: all 0.3s;
             position: relative;
-            transition: all 0.3s ease;
         }
         
-        .mic-button:active { transform: scale(0.95); }
-        
-        .mic-button.listening {
+        .mic-btn.listening {
             background: #10b981;
             color: white;
             animation: mic-pulse 1.5s infinite;
@@ -266,18 +327,140 @@
         
         @keyframes mic-pulse {
             0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            50% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+            50% { box-shadow: 0 0 0 25px rgba(16, 185, 129, 0); }
         }
         
-        /* Status Indicator */
-        .status-bar {
+        /* Effects */
+        .heart-particle {
+            position: absolute;
+            font-size: 28px;
+            animation: float-up 1.5s ease-out forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes float-up {
+            0% { opacity: 1; transform: translateY(0) scale(0); }
+            100% { opacity: 0; transform: translateY(-100px) scale(1); }
+        }
+        
+        .music-note {
+            position: absolute;
+            font-size: 32px;
+            animation: note-float 2s ease-out forwards;
+        }
+        
+        @keyframes note-float {
+            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(-120px) rotate(360deg); }
+        }
+        
+        /* Settings Panel */
+        .settings-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .settings-overlay.active {
             display: flex;
+            opacity: 1;
+        }
+        
+        .settings-panel {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            margin: auto;
+            border-radius: 24px;
+            padding: 24px;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        
+        .settings-overlay.active .settings-panel {
+            transform: scale(1);
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 15px;
+            transition: all 0.2s;
+            outline: none;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+        
+        .voice-option {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .voice-option:hover {
+            border-color: var(--primary);
+            background: #f5f3ff;
+        }
+        
+        .voice-option.selected {
+            border-color: var(--primary);
+            background: #ede9fe;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c7c7c7;
+            border-radius: 4px;
+        }
+        
+        /* Status */
+        .status-bar {
+            display: inline-flex;
             align-items: center;
             gap: 8px;
             background: rgba(255,255,255,0.9);
             padding: 8px 16px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
@@ -289,212 +472,185 @@
             background: #9ca3af;
         }
         .status-dot.active { background: #10b981; animation: blink 1s infinite; }
-        .status-dot.speaking { background: #6366f1; animation: blink 0.5s infinite; }
+        .status-dot.speaking { background: var(--primary); animation: blink 0.3s infinite; }
+        
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        
-        /* Hearts & Effects */
-        .heart-particle {
-            position: absolute;
-            font-size: 24px;
-            animation: float-up 1.5s ease-out forwards;
-            pointer-events: none;
-            z-index: 50;
-        }
-        @keyframes float-up {
-            0% { opacity: 1; transform: translateY(0) scale(0) rotate(0deg); }
-            50% { transform: translateY(-60px) scale(1.2) rotate(180deg); }
-            100% { opacity: 0; transform: translateY(-120px) scale(0.5) rotate(360deg); }
-        }
-        
-        .music-note {
-            position: absolute;
-            font-size: 30px;
-            animation: note-float 2s ease-out forwards;
-            z-index: 50;
-        }
-        @keyframes note-float {
-            0% { opacity: 1; transform: translateY(0) translateX(0); }
-            100% { opacity: 0; transform: translateY(-100px) translateX(30px); }
-        }
-        
-        /* Search Panel */
-        #search-panel {
-            position: fixed;
-            inset: 0;
-            background: white;
-            z-index: 2000;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-        #search-panel.active { transform: translateY(0); }
-        
-        /* Google Popup */
-        .google-popup {
-            position: fixed;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%) translateX(200px);
-            background: white;
-            padding: 16px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            z-index: 1500;
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .google-popup.active {
-            opacity: 1;
-            transform: translateY(-50%) translateX(0);
-        }
     </style>
 </head>
 <body>
 
-    <div id="overlay" onclick="toggleSidebar()"></div>
-
-    <!-- Sidebar -->
-    <aside id="sidebar" class="fixed inset-y-0 left-0 w-80 bg-white shadow-2xl transform -translate-x-full z-50">
-        <div class="p-6 h-full flex flex-col">
-            <div class="flex items-center gap-3 mb-8">
-                <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-2xl">🐱</div>
+    <!-- Settings Overlay (Both Mobile & PC) -->
+    <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings(event)">
+        <div class="settings-panel" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h2 class="text-xl font-black text-indigo-600">AI Cat</h2>
-                    <p class="text-xs text-gray-400">Smart Companion</p>
+                    <h2 class="text-2xl font-black text-indigo-600">Settings</h2>
+                    <p class="text-sm text-gray-400">Customize your AI Cat</p>
                 </div>
+                <button onclick="closeSettings()" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             
-            <div class="space-y-6 flex-1 overflow-y-auto">
-                <div>
-                    <label class="text-xs font-bold text-gray-400 uppercase">OpenRouter API Key</label>
-                    <input type="password" id="api-key" class="w-full mt-2 p-4 bg-gray-50 rounded-xl border-2 border-transparent focus:border-indigo-500 outline-none text-sm transition-all">
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-gray-400 uppercase">Model ID</label>
-                    <input type="text" id="model-profile" value="google/gemini-2.0-flash-exp:free" class="w-full mt-2 p-4 bg-gray-50 rounded-xl border-2 border-transparent focus:border-indigo-500 outline-none text-sm transition-all">
+            <div class="space-y-6">
+                <!-- API Settings -->
+                <div class="p-4 bg-indigo-50 rounded-xl">
+                    <h3 class="font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                        <i class="fas fa-robot"></i> AI Configuration
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">OpenRouter API Key</label>
+                        <input type="password" id="apiKey" class="form-input" placeholder="sk-or-...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">AI Model</label>
+                        <select id="modelSelect" class="form-select">
+                            <option value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash (Free)</option>
+                            <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                            <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+                            <option value="meta-llama/llama-3.1-8b-instruct">Llama 3.1 8B</option>
+                        </select>
+                    </div>
                 </div>
                 
-                <div class="bg-indigo-50 rounded-xl p-4 space-y-2">
-                    <p class="text-xs font-bold text-indigo-700 uppercase">Voice Commands:</p>
-                    <div class="text-xs text-indigo-600 space-y-1">
-                        <p>💃 "Dance" → Cat dances</p>
-                        <p>🔍 "Search for..." → Google search</p>
-                        <p>❤️ "I love you" → Happy mode</p>
-                        <p>😾 "Bad cat" → Sad mode</p>
+                <!-- Voice Settings -->
+                <div class="p-4 bg-pink-50 rounded-xl">
+                    <h3 class="font-bold text-pink-900 mb-4 flex items-center gap-2">
+                        <i class="fas fa-microphone"></i> Voice Settings
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Select Voice</label>
+                        <div id="voiceList" class="max-h-48 overflow-y-auto">
+                            <div class="text-sm text-gray-500">Loading voices...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Speech Rate: <span id="rateValue">1.0</span></label>
+                        <input type="range" id="speechRate" min="0.5" max="2" step="0.1" value="1" class="w-full accent-indigo-600">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Pitch: <span id="pitchValue">1.2</span></label>
+                        <input type="range" id="speechPitch" min="0.5" max="2" step="0.1" value="1.2" class="w-full accent-indigo-600">
+                    </div>
+                </div>
+                
+                <!-- Behavior Settings -->
+                <div class="p-4 bg-emerald-50 rounded-xl">
+                    <h3 class="font-bold text-emerald-900 mb-4 flex items-center gap-2">
+                        <i class="fas fa-cog"></i> Behavior
+                    </h3>
+                    
+                    <div class="flex items-center justify-between p-3 bg-white rounded-xl mb-3">
+                        <div>
+                            <div class="font-semibold text-gray-800">Auto-Listen</div>
+                            <div class="text-xs text-gray-500">Start listening after speaking</div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="autoListenToggle" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-3 bg-white rounded-xl">
+                        <div>
+                            <div class="font-semibold text-gray-800">Show English Subtitles</div>
+                            <div class="text-xs text-gray-500">Display English translation</div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="subtitleToggle" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Language -->
+                <div class="p-4 bg-amber-50 rounded-xl">
+                    <h3 class="font-bold text-amber-900 mb-4 flex items-center gap-2">
+                        <i class="fas fa-language"></i> Language
+                    </h3>
+                    <div class="form-group">
+                        <label class="form-label">Response Language</label>
+                        <select id="langSelect" class="form-select">
+                            <option value="bn">Bengali (Bangla)</option>
+                            <option value="hi">Hindi</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="ja">Japanese</option>
+                        </select>
                     </div>
                 </div>
             </div>
             
-            <button onclick="saveSettings()" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">Save Settings</button>
-        </div>
-    </aside>
-
-    <!-- Search Panel -->
-    <div id="search-panel">
-        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 pt-safe">
-            <div class="flex items-center gap-4">
-                <button onclick="closeSearch()" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white">
-                    <i class="fas fa-arrow-down"></i>
-                </button>
-                <div class="flex-1 bg-white rounded-full flex items-center px-4 py-2">
-                    <input type="text" id="search-input" placeholder="Search Google..." class="flex-1 outline-none text-sm" onkeydown="if(event.key==='Enter') doSearch()">
-                    <button onclick="doSearch()" class="text-blue-500 w-8 h-8 flex items-center justify-center">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div id="search-results" class="flex-1 overflow-y-auto p-4 bg-gray-50">
-            <div class="text-center text-gray-400 mt-10">
-                <i class="fab fa-google text-4xl mb-4 opacity-30"></i>
-                <p>Say "Search for [topic]" or type above</p>
-            </div>
+            <button onclick="saveSettings()" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg mt-6 shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">
+                Save Settings
+            </button>
         </div>
     </div>
 
-    <!-- Google Popup -->
-    <div class="google-popup" id="google-popup">
-        <button onclick="openSearch()" class="w-14 h-14 bg-gradient-to-br from-blue-400 to-green-400 rounded-full flex items-center justify-center text-white text-2xl shadow-lg">
-            <i class="fab fa-google"></i>
-        </button>
-    </div>
-
-    <!-- Main App -->
-    <div class="mobile-container">
-        <!-- Header -->
-        <header class="p-4 flex items-center justify-between z-50">
-            <button onclick="toggleSidebar()" class="w-12 h-12 bg-white/90 backdrop-blur rounded-full shadow flex items-center justify-center text-indigo-600">
-                <i class="fas fa-bars"></i>
+    <!-- ==================== MOBILE VIEW ==================== -->
+    <div class="mobile-view" id="mobileView">
+        <!-- Header with Input -->
+        <div class="mobile-header">
+            <button onclick="openSettings()" class="w-12 h-12 bg-white rounded-full shadow flex items-center justify-center text-indigo-600">
+                <i class="fas fa-cog text-lg"></i>
             </button>
             
-            <div class="status-bar">
-                <div class="status-dot" id="status-dot"></div>
-                <span id="status-text">Ready</span>
+            <div class="mobile-input-bar">
+                <input type="text" id="mobileInput" class="mobile-input" placeholder="Type or speak..." onkeydown="if(event.key==='Enter') sendMobileText()">
+                <button onclick="sendMobileText()" class="mobile-send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
             </div>
-        </header>
-
-        <!-- Cat Stage -->
-        <div id="cat-stage">
+        </div>
+        
+        <!-- Cat Area -->
+        <div class="mobile-cat-area">
             <!-- Speech Bubble -->
-            <div id="speech-bubble">
-                <div class="bg-white/95 backdrop-blur p-4 rounded-2xl shadow-xl">
-                    <div id="drag-handle" class="w-8 h-1 bg-gray-200 mx-auto mb-2 rounded-full"></div>
-                    <p id="user-transcript" class="text-indigo-500 text-xs font-bold mb-1 opacity-60"></p>
-                    <p id="ai-caption" class="text-gray-800 text-base font-bold bangla-text leading-snug">হ্যালো! আমি তোমার বিড়াল।</p>
-                    <p id="english-sub" class="text-gray-400 text-xs mt-1 pt-1 border-t border-gray-100">Hello! I'm your cat.</p>
+            <div class="speech-bubble" id="mobileBubble">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-2 h-2 bg-gray-300 rounded-full cursor-move" id="mobileDrag"></div>
+                    <div class="flex-1 h-0.5 bg-gray-100"></div>
                 </div>
+                <p id="mobileUserText" class="text-indigo-500 text-xs font-bold mb-1 opacity-60"></p>
+                <p id="mobileCaption" class="text-gray-800 text-lg font-bold bangla-text leading-snug">হ্যালো!</p>
+                <p id="mobileSub" class="text-gray-400 text-xs mt-2 pt-2 border-t border-gray-100">Hello!</p>
             </div>
-
+            
             <!-- Cat -->
-            <div id="cat-wrapper" class="relative">
-                <!-- Touch Zones -->
+            <div id="cat-wrapper">
                 <div class="touch-zone touch-left" onclick="handlePet()"></div>
                 <div class="touch-zone touch-right" onclick="handleScold()"></div>
                 <div class="mouth-zone" onclick="stopSpeaking()"></div>
-
+                
                 <svg viewBox="0 0 200 220" class="w-full h-full">
-                    <!-- Shadow -->
                     <ellipse cx="100" cy="210" rx="70" ry="12" fill="#000" opacity="0.1" />
-                    
-                    <!-- Tail -->
                     <path id="tail" d="M140 170 Q160 140 150 110 Q140 80 155 60" stroke="#4f46e5" stroke-width="14" fill="none" stroke-linecap="round" />
-                    
-                    <!-- Body -->
                     <ellipse cx="100" cy="170" rx="55" ry="45" fill="#6366f1" />
-                    <ellipse cx="100" cy="180" rx="40" ry="35" fill="#818cf8" opacity="0.5" />
+                    <path d="M60 200 Q100 160 140 200" fill="#4f46e5" />
+                    <ellipse cx="70" cy="205" rx="15" ry="10" fill="#e0e7ff" />
+                    <ellipse cx="130" cy="205" rx="15" ry="10" fill="#e0e7ff" />
                     
-                    <!-- Paws -->
-                    <ellipse cx="70" cy="200" rx="15" ry="10" fill="#e0e7ff" />
-                    <ellipse cx="130" cy="200" rx="15" ry="10" fill="#e0e7ff" />
-                    
-                    <!-- Head Group -->
                     <g id="head-group" style="transform-origin: 100px 100px;">
-                        <!-- Ears -->
                         <path d="M45 50 L25 10 L70 35 Z" fill="#4338ca" />
                         <path d="M155 50 L175 10 L130 35 Z" fill="#4338ca" />
-                        <path d="M52 45 L38 20 L65 32 Z" fill="#818cf8" />
-                        <path d="M148 45 L162 20 L135 32 Z" fill="#818cf8" />
-                        
-                        <!-- Face -->
                         <circle cx="100" cy="105" r="80" fill="#6366f1" />
                         <ellipse cx="100" cy="118" rx="62" ry="52" fill="#e0e7ff" />
                         
-                        <!-- Eyes -->
-                        <g id="eyes" style="transform-origin: center;">
+                        <g id="eyes">
                             <ellipse class="eye-lid" cx="72" cy="110" rx="11" ry="11" fill="#1e293b" />
                             <ellipse class="eye-lid" cx="128" cy="110" rx="11" ry="11" fill="#1e293b" />
                             <circle cx="75" cy="107" r="4" fill="white" opacity="0.8" />
                             <circle cx="131" cy="107" r="4" fill="white" opacity="0.8" />
                         </g>
                         
-                        <!-- Nose -->
                         <path d="M92 135 L108 135 L100 145 Z" fill="#f472b6" />
-                        
-                        <!-- Mouth -->
                         <path id="mouth" d="M85 150 Q100 160 115 150" stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round" />
                         
-                        <!-- Whiskers -->
                         <g stroke="#1e293b" stroke-width="1.5" opacity="0.4">
                             <line x1="30" y1="120" x2="65" y2="125" />
                             <line x1="28" y1="135" x2="65" y2="135" />
@@ -503,111 +659,288 @@
                             <line x1="172" y1="135" x2="135" y2="135" />
                             <line x1="170" y1="150" x2="135" y2="145" />
                         </g>
-                        
-                        <!-- Cheeks -->
-                        <circle cx="60" cy="135" r="10" fill="#f472b6" opacity="0.3" />
-                        <circle cx="140" cy="135" r="10" fill="#f472b6" opacity="0.3" />
                     </g>
                 </svg>
             </div>
         </div>
-
+        
         <!-- Controls -->
-        <div class="controls-area">
-            <div class="flex justify-center items-center gap-6">
-                <button onclick="triggerDance()" class="w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Dance">
+        <div class="mobile-controls">
+            <div class="flex justify-center items-center gap-8">
+                <button onclick="triggerDance()" class="w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center text-2xl active:scale-90 transition-transform">
                     💃
                 </button>
                 
-                <button id="mic-btn" onclick="toggleMic()" class="mic-button text-gray-400">
+                <button id="mobileMic" onclick="toggleMic()" class="mic-btn text-gray-400">
                     <i class="fas fa-microphone"></i>
                 </button>
                 
-                <button onclick="manualEmotion('love')" class="w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Love">
+                <button onclick="manualEmotion('love')" class="w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center text-2xl active:scale-90 transition-transform">
                     ❤️
                 </button>
             </div>
             
-            <p class="text-center text-xs text-gray-400 mt-3 font-medium">
-                Tap mic to toggle • Tap cat to interact
-            </p>
+            <div class="flex justify-center mt-4">
+                <div class="status-bar">
+                    <div class="status-dot" id="mobileStatusDot"></div>
+                    <span id="mobileStatusText">Tap mic to start</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PC VIEW ==================== -->
+    <div class="pc-view" id="pcView">
+        <!-- Left Sidebar -->
+        <div class="pc-sidebar">
+            <div class="mb-8">
+                <h1 class="text-3xl font-black text-indigo-600 mb-2">AI Cat</h1>
+                <p class="text-gray-500">Your smart companion</p>
+            </div>
+            
+            <div class="space-y-4 flex-1">
+                <div class="p-4 bg-indigo-50 rounded-xl">
+                    <h3 class="font-bold text-indigo-900 mb-3">Quick Actions</h3>
+                    <div class="space-y-2">
+                        <button onclick="triggerDance()" class="w-full p-3 bg-white rounded-lg text-left hover:bg-indigo-100 transition-colors flex items-center gap-3">
+                            <span class="text-2xl">💃</span>
+                            <div>
+                                <div class="font-semibold">Dance</div>
+                                <div class="text-xs text-gray-500">Make the cat dance</div>
+                            </div>
+                        </button>
+                        <button onclick="manualEmotion('love')" class="w-full p-3 bg-white rounded-lg text-left hover:bg-pink-100 transition-colors flex items-center gap-3">
+                            <span class="text-2xl">❤️</span>
+                            <div>
+                                <div class="font-semibold">Show Love</div>
+                                <div class="text-xs text-gray-500">Pet the cat</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-4 bg-gray-50 rounded-xl">
+                    <h3 class="font-bold text-gray-900 mb-3">Voice Commands</h3>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>💃 <strong>"Dance"</strong> - Cat dances</li>
+                        <li>🔍 <strong>"Search for..."</strong> - Google search</li>
+                        <li>❤️ <strong>"I love you"</strong> - Happy mode</li>
+                        <li>😾 <strong>"Bad cat"</strong> - Sad mode</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <button onclick="openSettings()" class="w-full p-4 bg-gray-100 rounded-xl text-left flex items-center gap-3 hover:bg-gray-200 transition-colors mt-4">
+                <i class="fas fa-cog text-xl text-gray-600"></i>
+                <div>
+                    <div class="font-semibold">Settings</div>
+                    <div class="text-xs text-gray-500">Customize AI & Voice</div>
+                </div>
+            </button>
+        </div>
+        
+        <!-- Main Area -->
+        <div class="pc-main">
+            <!-- Header -->
+            <div class="pc-header">
+                <div class="status-bar">
+                    <div class="status-dot" id="pcStatusDot"></div>
+                    <span id="pcStatusText">Ready</span>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-500">Auto-Listen: <span class="text-emerald-500 font-bold">ON</span></span>
+                </div>
+            </div>
+            
+            <!-- Cat Stage -->
+            <div class="pc-cat-stage">
+                <!-- Speech Bubble -->
+                <div class="speech-bubble" id="pcBubble">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-2 h-2 bg-gray-300 rounded-full cursor-move" id="pcDrag"></div>
+                        <div class="flex-1 h-0.5 bg-gray-100"></div>
+                    </div>
+                    <p id="pcUserText" class="text-indigo-500 text-sm font-bold mb-1 opacity-60"></p>
+                    <p id="pcCaption" class="text-gray-800 text-xl font-bold bangla-text leading-relaxed">হ্যালো! আমি তোমার বুদ্ধিমান বিড়াল।</p>
+                    <p id="pcSub" class="text-gray-400 text-sm mt-2 pt-2 border-t border-gray-100">Hello! I'm your smart AI cat.</p>
+                </div>
+                
+                <!-- Cat -->
+                <div id="cat-wrapper">
+                    <div class="touch-zone touch-left" onclick="handlePet()"></div>
+                    <div class="touch-zone touch-right" onclick="handleScold()"></div>
+                    <div class="mouth-zone" onclick="stopSpeaking()"></div>
+                    
+                    <svg viewBox="0 0 200 220" class="w-full h-full">
+                        <ellipse cx="100" cy="210" rx="70" ry="12" fill="#000" opacity="0.1" />
+                        <path id="tail" d="M140 170 Q160 140 150 110 Q140 80 155 60" stroke="#4f46e5" stroke-width="16" fill="none" stroke-linecap="round" />
+                        <ellipse cx="100" cy="170" rx="60" ry="50" fill="#6366f1" />
+                        <path d="M55 205 Q100 155 145 205" fill="#4f46e5" />
+                        <ellipse cx="75" cy="210" rx="18" ry="12" fill="#e0e7ff" />
+                        <ellipse cx="125" cy="210" rx="18" ry="12" fill="#e0e7ff" />
+                        
+                        <g id="head-group" style="transform-origin: 100px 100px;">
+                            <path d="M45 50 L20 5 L70 35 Z" fill="#4338ca" />
+                            <path d="M155 50 L180 5 L130 35 Z" fill="#4338ca" />
+                            <circle cx="100" cy="105" r="85" fill="#6366f1" />
+                            <ellipse cx="100" cy="120" rx="65" ry="55" fill="#e0e7ff" />
+                            
+                            <g id="eyes">
+                                <ellipse class="eye-lid" cx="70" cy="115" rx="12" ry="12" fill="#1e293b" />
+                                <ellipse class="eye-lid" cx="130" cy="115" rx="12" ry="12" fill="#1e293b" />
+                                <circle cx="73" cy="112" r="5" fill="white" opacity="0.9" />
+                                <circle cx="133" cy="112" r="5" fill="white" opacity="0.9" />
+                            </g>
+                            
+                            <path d="M90 140 L110 140 L100 152 Z" fill="#f472b6" />
+                            <path id="mouth" d="M82 158 Q100 170 118 158" stroke="#1e293b" stroke-width="3.5" fill="none" stroke-linecap="round" />
+                            
+                            <g stroke="#1e293b" stroke-width="2" opacity="0.4">
+                                <line x1="25" y1="125" x2="65" y2="130" />
+                                <line x1="22" y1="142" x2="65" y2="142" />
+                                <line x1="25" y1="158" x2="65" y2="152" />
+                                <line x1="175" y1="125" x2="135" y2="130" />
+                                <line x1="178" y1="142" x2="135" y2="142" />
+                                <line x1="175" y1="158" x2="135" y2="152" />
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- PC Input Area -->
+            <div class="pc-input-area">
+                <button onclick="toggleMic()" id="pcMicBtn" class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 transition-colors">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <input type="text" id="pcInput" class="flex-1 border-none outline-none px-4 text-base" placeholder="Type your message or click mic to speak..." onkeydown="if(event.key==='Enter') sendPcText()">
+                <button onclick="sendPcText()" class="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center hover:bg-indigo-700 transition-colors">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
+        // ==================== STATE ====================
         const STATE = {
             listening: false,
             speaking: false,
             dancing: false,
             emotion: 'neutral',
             autoListen: true,
+            showSubtitles: true,
+            selectedVoice: null,
+            speechRate: 1,
+            speechPitch: 1.2,
+            targetLang: 'bn',
+            isMobile: window.innerWidth < 1024,
             config: {
                 key: localStorage.getItem('cat_key') || '',
                 model: localStorage.getItem('cat_model') || 'google/gemini-2.0-flash-exp:free'
             }
         };
 
-        // === AUTO-LISTEN SYSTEM ===
-        // After speaking ends, automatically start listening again
-        function onSpeechEnd() {
-            STATE.speaking = false;
-            document.body.classList.remove('is-speaking');
-            document.getElementById('mouth').setAttribute('d', 'M85 150 Q100 160 115 150');
-            updateStatus('ready');
-            
-            // CRITICAL: Auto-restart listening after a short delay
-            if (STATE.autoListen) {
-                setTimeout(() => {
-                    if (!STATE.speaking && !STATE.dancing) {
-                        startListening();
-                    }
-                }, 800);
+        // ==================== DEVICE DETECTION ====================
+        window.addEventListener('resize', () => {
+            STATE.isMobile = window.innerWidth < 1024;
+        });
+
+        function getElements() {
+            if (STATE.isMobile) {
+                return {
+                    userText: document.getElementById('mobileUserText'),
+                    caption: document.getElementById('mobileCaption'),
+                    sub: document.getElementById('mobileSub'),
+                    mic: document.getElementById('mobileMic'),
+                    statusDot: document.getElementById('mobileStatusDot'),
+                    statusText: document.getElementById('mobileStatusText'),
+                    input: document.getElementById('mobileInput')
+                };
+            } else {
+                return {
+                    userText: document.getElementById('pcUserText'),
+                    caption: document.getElementById('pcCaption'),
+                    sub: document.getElementById('pcSub'),
+                    mic: document.getElementById('pcMicBtn'),
+                    statusDot: document.getElementById('pcStatusDot'),
+                    statusText: document.getElementById('pcStatusText'),
+                    input: document.getElementById('pcInput')
+                };
             }
         }
 
-        // === DANCE SYSTEM ===
-        function triggerDance() {
-            if (STATE.dancing) return;
+        // ==================== VOICE SETUP ====================
+        let voices = [];
+        function loadVoices() {
+            voices = window.speechSynthesis.getVoices();
+            const voiceList = document.getElementById('voiceList');
+            voiceList.innerHTML = '';
             
-            STATE.dancing = true;
-            const wrapper = document.getElementById('cat-wrapper');
-            wrapper.classList.add('dancing');
+            const goodVoices = voices.filter(v => v.lang.startsWith('en'));
             
-            // Create music notes
-            createMusicNotes();
-            
-            // Stop any current speech
-            window.speechSynthesis.cancel();
-            STATE.speaking = false;
-            
-            speak("I'm dancing! Watch me!", "আমি নাচছি! দেখো!", false);
-            
-            // Stop dancing after 5 seconds
-            setTimeout(() => {
-                wrapper.classList.remove('dancing');
-                STATE.dancing = false;
-                onSpeechEnd(); // Trigger auto-listen after dance
-            }, 5000);
+            goodVoices.forEach((voice, index) => {
+                const div = document.createElement('div');
+                div.className = 'voice-option';
+                if (voice.name.includes('Google US English') || voice.name.includes('Samantha')) {
+                    div.classList.add('selected');
+                    STATE.selectedVoice = voice;
+                }
+                div.innerHTML = `
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-semibold text-sm">${voice.name}</div>
+                        <div class="text-xs text-gray-500">${voice.lang}</div>
+                    </div>
+                `;
+                div.onclick = () => {
+                    document.querySelectorAll('.voice-option').forEach(v => v.classList.remove('selected'));
+                    div.classList.add('selected');
+                    STATE.selectedVoice = voice;
+                };
+                voiceList.appendChild(div);
+            });
         }
 
-        function createMusicNotes() {
-            const notes = ['🎵', '🎶', '💃', '✨'];
-            const container = document.getElementById('cat-wrapper');
+        if (window.speechSynthesis) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+            setTimeout(loadVoices, 1000);
+        }
+
+        // ==================== DANCE ====================
+        function triggerDance() {
+            if (STATE.dancing) return;
+            STATE.dancing = true;
             
+            const wrapper = document.querySelector('#cat-wrapper');
+            wrapper.classList.add('dancing');
+            
+            // Music notes
             for (let i = 0; i < 8; i++) {
                 setTimeout(() => {
                     const note = document.createElement('div');
                     note.className = 'music-note';
-                    note.innerText = notes[Math.floor(Math.random() * notes.length)];
+                    note.innerText = ['🎵', '🎶', '💃', '🕺', '✨'][Math.floor(Math.random() * 5)];
                     note.style.left = (20 + Math.random() * 200) + 'px';
-                    note.style.top = (50 + Math.random() * 100) + 'px';
-                    container.appendChild(note);
+                    note.style.top = '50px';
+                    wrapper.appendChild(note);
                     setTimeout(() => note.remove(), 2000);
-                }, i * 300);
+                }, i * 250);
             }
+            
+            speak("I'm dancing! Watch me move!", "আমি নাচছি! দেখো!", false);
+            
+            setTimeout(() => {
+                wrapper.classList.remove('dancing');
+                STATE.dancing = false;
+                onSpeechEnd();
+            }, 6000);
         }
 
-        // === EMOTION & TOUCH ===
+        // ==================== EMOTIONS & TOUCH ====================
         function handlePet() {
             if (STATE.dancing) return;
             setEmotion('love');
@@ -619,7 +952,7 @@
             if (STATE.dancing) return;
             setEmotion('sad');
             createTears();
-            speak("Meow... why?", "মিউ... কেন?");
+            speak("Meow... why scold me?", "মিউ... কেন বকছো?");
         }
 
         function manualEmotion(emo) {
@@ -627,12 +960,12 @@
             setEmotion(emo);
             if (emo === 'love') {
                 createHearts();
-                speak("Purr!", "গুরুগুরু!");
+                speak("Purr purr!", "গুরুগুরু!");
             }
         }
 
         function setEmotion(emotion) {
-            const wrapper = document.getElementById('cat-wrapper');
+            const wrapper = document.querySelector('#cat-wrapper');
             wrapper.classList.remove('emotion-happy', 'emotion-sad', 'emotion-angry', 'emotion-love', 'dancing');
             STATE.emotion = emotion;
             if (emotion !== 'neutral') {
@@ -641,27 +974,26 @@
         }
 
         function createHearts() {
-            const container = document.getElementById('cat-wrapper');
-            for (let i = 0; i < 5; i++) {
+            const wrapper = document.querySelector('#cat-wrapper');
+            for (let i = 0; i < 6; i++) {
                 setTimeout(() => {
                     const heart = document.createElement('div');
                     heart.className = 'heart-particle';
-                    heart.innerText = ['💕', '💖', '💗', '💝'][Math.floor(Math.random() * 4)];
-                    heart.style.left = (40 + Math.random() * 160) + 'px';
+                    heart.innerText = '💖';
+                    heart.style.left = (40 + Math.random() * 180) + 'px';
                     heart.style.top = '80px';
-                    container.appendChild(heart);
+                    wrapper.appendChild(heart);
                     setTimeout(() => heart.remove(), 1500);
-                }, i * 150);
+                }, i * 100);
             }
         }
 
         function createTears() {
-            const eyes = document.getElementById('eyes');
+            const eyes = document.querySelector('#eyes');
             for (let i = 0; i < 3; i++) {
                 setTimeout(() => {
                     const tear = document.createElement('div');
-                    tear.className = 'tear';
-                    tear.style.cssText = 'position:absolute;width:10px;height:14px;background:#60a5fa;border-radius:50%;left:' + (i % 2 === 0 ? 65 : 115) + 'px;top:115px;animation:fall 1s linear forwards;z-index:50;';
+                    tear.style.cssText = 'position:absolute;width:12px;height:16px;background:#60a5fa;border-radius:50%;left:' + (i % 2 === 0 ? 60 : 140) + 'px;top:120px;animation:fall 1s linear forwards;z-index:50;';
                     eyes.appendChild(tear);
                     setTimeout(() => tear.remove(), 1000);
                 }, i * 200);
@@ -675,7 +1007,19 @@
             }
         }
 
-        // === SPEECH RECOGNITION ===
+        // ==================== AUTO-LISTEN SYSTEM ====================
+        function onSpeechEnd() {
+            STATE.speaking = false;
+            document.body.classList.remove('is-speaking');
+            document.querySelector('#mouth').setAttribute('d', STATE.isMobile ? 'M85 150 Q100 160 115 150' : 'M82 158 Q100 170 118 158');
+            updateStatus('ready');
+            
+            if (STATE.autoListen && !STATE.dancing) {
+                setTimeout(() => startListening(), 1000);
+            }
+        }
+
+        // ==================== SPEECH RECOGNITION ====================
         const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
         let rec = null;
 
@@ -688,33 +1032,31 @@
             rec.onstart = () => {
                 STATE.listening = true;
                 document.body.classList.add('listening-active');
-                document.getElementById('mic-btn').classList.add('listening');
+                const els = getElements();
+                els.mic.classList.add('listening');
                 updateStatus('listening');
             };
 
             rec.onresult = (e) => {
                 const text = e.results[0][0].transcript;
-                document.getElementById('user-transcript').innerText = text;
+                const els = getElements();
+                els.userText.innerText = `"${text}"`;
                 processCommand(text);
             };
 
             rec.onend = () => {
                 STATE.listening = false;
                 document.body.classList.remove('listening-active');
-                document.getElementById('mic-btn').classList.remove('listening');
+                const els = getElements();
+                els.mic.classList.remove('listening');
                 
-                // Auto-restart if conditions met
                 if (STATE.autoListen && !STATE.speaking && !STATE.dancing) {
                     setTimeout(() => startListening(), 500);
-                } else {
-                    updateStatus('ready');
                 }
             };
 
             rec.onerror = () => {
-                STATE.listening = false;
-                document.body.classList.remove('listening-active');
-                document.getElementById('mic-btn').classList.remove('listening');
+                rec.stop();
                 if (STATE.autoListen) setTimeout(() => startListening(), 1000);
             };
         }
@@ -723,8 +1065,8 @@
             if (!rec || STATE.listening || STATE.speaking || STATE.dancing) return;
             try {
                 rec.start();
-            } catch (e) {
-                setTimeout(() => startListening(), 500);
+            } catch(e) {
+                setTimeout(startListening, 500);
             }
         }
 
@@ -738,63 +1080,61 @@
             if (STATE.listening) {
                 STATE.autoListen = !STATE.autoListen;
                 rec.stop();
-                updateStatus(STATE.autoListen ? 'auto' : 'manual');
+                updateStatus(STATE.autoListen ? 'ready' : 'manual');
             } else {
                 STATE.autoListen = true;
                 startListening();
             }
         }
 
-        // === COMMAND PROCESSING ===
+        // ==================== COMMANDS ====================
         function processCommand(text) {
             const lower = text.toLowerCase();
-            
-            // DANCE command
-            if (lower.includes('dance') || lower.includes('নাচো') || lower.includes('নাচ')) {
+            const els = getElements();
+
+            if (lower.includes('dance') || lower.includes('নাচ')) {
                 triggerDance();
                 return;
             }
-            
-            // Search
+
             if (lower.includes('search for') || lower.includes('search')) {
                 const query = text.replace(/search for|search/i, '').trim();
-                showGooglePopup(query);
+                if (query) {
+                    window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+                    speak(`Searching Google for ${query}`, `গুগলে ${query} খোঁজা হচ্ছে`);
+                }
                 return;
             }
-            
-            if (lower.includes('open google')) {
-                showGooglePopup();
+
+            if (lower.includes('open setting') || lower.includes('setting')) {
+                openSettings();
                 return;
             }
-            
-            if (lower.includes('close')) {
-                closeSearch();
-                return;
-            }
-            
-            // Emotions
+
             if (lower.includes('love') || lower.includes('like')) setEmotion('love');
             else if (lower.includes('bad') || lower.includes('angry')) setEmotion('angry');
-            else if (lower.includes('sad') || lower.includes('cry')) setEmotion('sad');
-            else if (lower.includes('happy')) setEmotion('happy');
-            
+            else if (lower.includes('sad')) setEmotion('sad');
+
             callAI(text);
         }
 
-        // === AI API ===
+        // ==================== AI API ====================
         async function callAI(text) {
             if (!STATE.config.key) {
                 speak("Please add API key in settings", "সেটিংসে API key যোগ করুন");
-                toggleSidebar();
+                openSettings();
                 return;
             }
 
             updateStatus('thinking');
-            
+
+            const langNames = { bn: 'Bengali', hi: 'Hindi', es: 'Spanish', fr: 'French', ja: 'Japanese' };
+            const targetLang = langNames[STATE.targetLang] || 'Bengali';
+
             const prompt = `You are a cute robot cat that can dance and show emotions. 
             Current emotion: ${STATE.emotion}.
-            Reply in English (very short, max 10 words), then add Bangla translation starting with "BN:".
-            User: "${text}"`;
+            Reply in English (max 12 words), then add ${targetLang} translation starting with "BN:".
+            User said: "${text}"`;
 
             try {
                 const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -813,175 +1153,173 @@
 
                 const data = await res.json();
                 const reply = data.choices[0].message.content;
-                
+
                 const lines = reply.split('\n');
                 let english = lines[0].replace(/^EN:\s*/i, '').trim();
-                let bangla = lines.find(l => l.toUpperCase().includes('BN:'))?.replace(/^BN:\s*/i, '').trim() || lines[1]?.replace(/^BN:\s*/i, '').trim() || "...";
-                
-                document.getElementById('ai-caption').innerText = bangla;
-                document.getElementById('english-sub').innerText = english;
-                
-                speak(english, bangla);
-                
+                let translated = lines.find(l => l.toUpperCase().includes('BN:'))?.replace(/^BN:\s*/i, '').trim() || lines[1]?.trim() || "...";
+
+                const els = getElements();
+                els.caption.innerText = translated;
+                if (STATE.showSubtitles) {
+                    els.sub.style.display = 'block';
+                    els.sub.innerText = english;
+                } else {
+                    els.sub.style.display = 'none';
+                }
+
+                speak(english, translated);
+
             } catch (e) {
-                speak("Meow! Error!", "মিউ! সমস্যা!");
+                speak("Meow! Something went wrong!", "মিউ! সমস্যা হয়েছে!");
             }
         }
 
-        function speak(english, bangla, autoListen = true) {
+        function speak(english, translated, autoListen = true) {
             STATE.speaking = true;
             window.speechSynthesis.cancel();
-            
+
             const ut = new SpeechSynthesisUtterance(english);
             ut.lang = 'en-US';
-            ut.rate = 1.1;
-            ut.pitch = 1.2;
+            ut.rate = STATE.speechRate;
+            ut.pitch = STATE.speechPitch;
             
-            const mouth = document.getElementById('mouth');
+            if (STATE.selectedVoice) {
+                ut.voice = STATE.selectedVoice;
+            }
+
+            const mouth = document.querySelector('#mouth');
             let mouthInterval;
-            
+
             ut.onstart = () => {
                 document.body.classList.add('is-speaking');
                 updateStatus('speaking');
                 
-                // Animate mouth
                 mouthInterval = setInterval(() => {
-                    const open = Math.random() > 0.4;
-                    mouth.setAttribute('d', open ? 'M85 150 Q100 170 115 150' : 'M85 150 Q100 160 115 150');
-                }, 120);
+                    const open = Math.random() > 0.3;
+                    if (STATE.isMobile) {
+                        mouth.setAttribute('d', open ? 'M85 150 Q100 175 115 150' : 'M85 150 Q100 160 115 150');
+                    } else {
+                        mouth.setAttribute('d', open ? 'M82 158 Q100 185 118 158' : 'M82 158 Q100 170 118 158');
+                    }
+                }, 100);
             };
-            
+
             ut.onend = () => {
                 clearInterval(mouthInterval);
                 if (autoListen) onSpeechEnd();
             };
-            
+
             window.speechSynthesis.speak(ut);
         }
 
-        // === UI HELPERS ===
+        // ==================== UI HELPERS ====================
         function updateStatus(status) {
-            const dot = document.getElementById('status-dot');
-            const text = document.getElementById('status-text');
-            
-            dot.className = 'status-dot';
+            const els = getElements();
+            els.statusDot.className = 'status-dot';
             
             switch(status) {
                 case 'listening':
-                    dot.classList.add('active');
-                    text.innerText = 'Listening...';
+                    els.statusDot.classList.add('active');
+                    els.statusText.innerText = 'Listening...';
                     break;
                 case 'speaking':
-                    dot.classList.add('speaking');
-                    text.innerText = 'Speaking...';
+                    els.statusDot.classList.add('speaking');
+                    els.statusText.innerText = 'Speaking...';
                     break;
                 case 'thinking':
-                    text.innerText = 'Thinking...';
-                    break;
-                case 'dancing':
-                    text.innerText = 'Dancing!';
+                    els.statusText.innerText = 'Thinking...';
                     break;
                 case 'manual':
-                    text.innerText = 'Manual Mode';
+                    els.statusText.innerText = 'Manual Mode (Tap mic)';
                     break;
                 default:
-                    dot.classList.add('active');
-                    text.innerText = 'Auto-Listen ON';
+                    els.statusDot.classList.add('active');
+                    els.statusText.innerText = STATE.autoListen ? 'Auto-Listen ON' : 'Ready (Tap mic)';
             }
         }
 
-        // === SEARCH ===
-        function showGooglePopup(query = '') {
-            const popup = document.getElementById('google-popup');
-            popup.classList.add('active');
-            if (query) {
-                speak(`Searching for ${query}`, `${query} খোঁজা হচ্ছে`);
-                setTimeout(() => openSearch(query), 1500);
-            }
+        function sendMobileText() {
+            const input = document.getElementById('mobileInput');
+            const text = input.value.trim();
+            if (!text) return;
+            document.getElementById('mobileUserText').innerText = `"${text}"`;
+            processCommand(text);
+            input.value = '';
         }
 
-        function openSearch(query = '') {
-            document.getElementById('google-popup').classList.remove('active');
-            document.getElementById('search-panel').classList.add('active');
-            if (query) {
-                document.getElementById('search-input').value = query;
-                doSearch(query);
-            }
+        function sendPcText() {
+            const input = document.getElementById('pcInput');
+            const text = input.value.trim();
+            if (!text) return;
+            document.getElementById('pcUserText').innerText = `"${text}"`;
+            processCommand(text);
+            input.value = '';
         }
 
-        function closeSearch() {
-            document.getElementById('search-panel').classList.remove('active');
-            if (STATE.autoListen) setTimeout(() => startListening(), 500);
-        }
-
-        function doSearch(query = null) {
-            const q = query || document.getElementById('search-input').value;
-            if (!q) return;
+        // ==================== SETTINGS ====================
+        function openSettings() {
+            document.getElementById('settingsOverlay').classList.add('active');
+            stopListening();
             
-            // Open Google in new tab
-            window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
-            
-            document.getElementById('search-results').innerHTML = `
-                <div class="text-center p-8">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-2xl mx-auto mb-4">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <p class="text-gray-600">Opened Google search for "${q}"</p>
-                    <button onclick="closeSearch()" class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-full text-sm font-bold">Close</button>
-                </div>
-            `;
+            // Load current values
+            document.getElementById('apiKey').value = STATE.config.key;
+            document.getElementById('modelSelect').value = STATE.config.model;
+            document.getElementById('speechRate').value = STATE.speechRate;
+            document.getElementById('rateValue').innerText = STATE.speechRate;
+            document.getElementById('speechPitch').value = STATE.speechPitch;
+            document.getElementById('pitchValue').innerText = STATE.speechPitch;
+            document.getElementById('autoListenToggle').checked = STATE.autoListen;
+            document.getElementById('subtitleToggle').checked = STATE.showSubtitles;
+            document.getElementById('langSelect').value = STATE.targetLang;
         }
 
-        function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            const isOpen = sb.style.transform === 'translateX(0px)';
-            sb.style.transform = isOpen ? 'translateX(-100%)' : 'translateX(0px)';
-            document.getElementById('overlay').style.display = isOpen ? 'none' : 'block';
+        function closeSettings(e) {
+            if (e && e.target !== document.getElementById('settingsOverlay')) return;
+            document.getElementById('settingsOverlay').classList.remove('active');
+            if (STATE.autoListen) startListening();
         }
 
         function saveSettings() {
-            STATE.config.key = document.getElementById('api-key').value;
-            STATE.config.model = document.getElementById('model-profile').value;
+            STATE.config.key = document.getElementById('apiKey').value;
+            STATE.config.model = document.getElementById('modelSelect').value;
+            STATE.speechRate = parseFloat(document.getElementById('speechRate').value);
+            STATE.speechPitch = parseFloat(document.getElementById('speechPitch').value);
+            STATE.autoListen = document.getElementById('autoListenToggle').checked;
+            STATE.showSubtitles = document.getElementById('subtitleToggle').checked;
+            STATE.targetLang = document.getElementById('langSelect').value;
+
             localStorage.setItem('cat_key', STATE.config.key);
             localStorage.setItem('cat_model', STATE.config.model);
-            toggleSidebar();
-            speak("Settings saved!", "সেটিংস সংরক্ষিত!");
+
+            closeSettings();
+            speak("Settings saved!", "সেটিংস সংরক্ষিত হয়েছে!");
         }
 
-        // === INIT ===
+        // Range input updates
+        document.getElementById('speechRate')?.addEventListener('input', (e) => {
+            document.getElementById('rateValue').innerText = e.target.value;
+        });
+        document.getElementById('speechPitch')?.addEventListener('input', (e) => {
+            document.getElementById('pitchValue').innerText = e.target.value;
+        });
+
+        // ==================== INIT ====================
         window.onload = () => {
-            document.getElementById('api-key').value = STATE.config.key;
-            document.getElementById('model-profile').value = STATE.config.model;
-            
-            // Draggable bubble
-            const bubble = document.getElementById('speech-bubble');
-            let startX, startY, initialX = 0, initialY = 0;
-            
-            document.getElementById('drag-handle').addEventListener('touchstart', (e) => {
-                startX = e.touches[0].clientX - initialX;
-                startY = e.touches[0].clientY - initialY;
-            });
-            
-            document.getElementById('drag-handle').addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                initialX = e.touches[0].clientX - startX;
-                initialY = e.touches[0].clientY - startY;
-                bubble.style.transform = `translate(calc(-50% + ${initialX}px), ${initialY}px)`;
-            });
-            
-            // Auto blink
-            setInterval(() => {
-                document.getElementById('eyes').classList.add('blink');
-                setTimeout(() => document.getElementById('eyes').classList.remove('blink'), 150);
-            }, 4000);
-            
+            // Load saved settings
+            STATE.config.key = localStorage.getItem('cat_key') || '';
+            STATE.config.model = localStorage.getItem('cat_model') || 'google/gemini-2.0-flash-exp:free';
+
             // Start auto-listen
-            setTimeout(() => startListening(), 1000);
-            
-            // Welcome
             setTimeout(() => {
-                speak("Hello! Say dance to see me move!", "হ্যালো! নাচ বলো আমাকে দেখতে!");
-            }, 1500);
+                if (STATE.autoListen) startListening();
+                speak("Hello! I'm your AI cat. Say dance to see me move!", "হ্যালো! আমি তোমার বিড়াল। নাচ বলো!");
+            }, 1000);
+
+            // Blink animation
+            setInterval(() => {
+                document.querySelector('#eyes')?.classList.add('blink');
+                setTimeout(() => document.querySelector('#eyes')?.classList.remove('blink'), 150);
+            }, 4000);
         };
     </script>
 </body>
